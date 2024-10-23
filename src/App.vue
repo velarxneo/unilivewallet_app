@@ -1,17 +1,17 @@
 <script>
-	export default {
-		onLaunch: function() {
-			console.log('App Launch')
-		},
-		onShow: function() {
-			console.log('App Show')
-		},
-		onHide: function() {
-			console.log('App Hide')
-		}
+import BottomMenu from './components/BottomMenu.vue'
+
+export default {
+	mpType: 'app',
+	components: {
+		BottomMenu
 	}
+}
 </script>
 
 <style>
-	/*每个页面公共css */
+/* Global styles */
+page {
+	background-color: #f8f8f8;
+}
 </style>

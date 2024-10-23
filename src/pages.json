@@ -1,16 +1,79 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "UniLive Wallet"
+			}
+		},
+		{
+			"path": "pages/OTCTrading/OTCTrading",
+			"style": {
+				"navigationBarTitleText": "OTC Trading",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/OG/OG",
+			"style": {
+				"navigationBarTitleText": "OG"
+			}
+		},
+		{
+			"path": "pages/Mission/Mission",
+			"style": {
+				"navigationBarTitleText": "Mission"
+			}
+		},
+		{
+			"path": "pages/Profile/Profile",
+			"style": {
+				"navigationBarTitleText": "Profile"
 			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "UniLive Wallet",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
-	}
+	},
+	"tabBar": {
+			"color": "#7A7E83",
+			"selectedColor": "#ff6b35",
+			"borderStyle": "black",
+			"backgroundColor": "#ffffff",
+			"list": [
+				{
+					"pagePath": "pages/index/index",
+					"iconPath": "static/tab-home.png",
+					"selectedIconPath": "static/tab-home-active.png",
+					"text": "首页"
+				},
+				{
+					"pagePath": "pages/OTCTrading/OTCTrading",
+					"iconPath": "static/tab-otc.png",
+					"selectedIconPath": "static/tab-otc-active.png",
+					"text": "OTC"
+				},
+				{
+					"pagePath": "pages/OG/OG",
+					"iconPath": "static/tab-og.png",
+					"selectedIconPath": "static/tab-og-active.png",
+					"text": "OG"
+				},
+				{
+					"pagePath": "pages/Mission/Mission",
+					"iconPath": "static/tab-mission.png",
+					"selectedIconPath": "static/tab-mission-active.png",
+					"text": "任务"
+				},
+				{
+					"pagePath": "pages/Profile/Profile",
+					"iconPath": "static/tab-profile.png",
+					"selectedIconPath": "static/tab-profile-active.png",
+					"text": "我的"
+				}
+			]
+		}
 }
