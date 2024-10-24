@@ -81,6 +81,13 @@ $uni-font-size-paragraph: 15px;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  padding-bottom: 80px; // Added padding at the bottom to account for the bottom menu
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f85634 0%, #f85634 10%, white 30%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
 }
 
 .uni-card {
@@ -299,10 +306,7 @@ page {
 /* You can add more global styles here */
 
 // OTC Trading styles
-.otc-container {
-  padding: 1.875rem; // 30px
-  background-color: $uni-bg-color;
-}
+
 
 .otc-header {
   display: flex;
@@ -314,32 +318,43 @@ page {
 .otc-title {
   font-size: $font-size-xxl;
   font-weight: bold;
+  color: #FFFFFF; // White color for the title
 }
 
 .otc-history-link {
   display: flex;
   align-items: center;
-  color: $uni-text-color-grey;
+  //color: $uni-text-color-grey;
+  color: #FFFFFF; // White color for the title
 }
 
 .otc-trading-pair {
   margin-bottom: 20rpx;
 }
 
+.otc-trading-pair-title {
+  font-size: $uni-font-size-base;
+  font-weight: normal;
+  color: #FFFFFF; // White color for the title
+  margin-bottom: 5rpx; // Add some space below the title
+}
+
 .otc-pair-selector {
   display: flex;
   background-color: $uni-bg-color-grey;
-  border-radius: 10rpx;
+  border-radius: 15rpx;
   overflow: hidden;
-  
+  font-weight: bold;
+  padding: 5rpx;
   text {
     flex: 1;
     text-align: center;
-    padding: 0.625rem 0; // 10px
+    padding: 0.50rem 0; // 10px
     
     &.active {
       background-color: $uni-color-primary;
       color: #fff;
+      border-radius: 15rpx;
     }
   }
 }
@@ -386,7 +401,7 @@ page {
     color: #fff;
     border: none;
     border-radius: 20rpx;
-    padding: 0.25rem 0; // 20px
+    padding: 0; // 20px
     &.btn-buy {
       background-color: $uni-color-success;
     }
@@ -456,3 +471,430 @@ page {
     color: $uni-color-warning;
   }
 }
+
+// Login Popup Styles
+.login-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($uni-bg-color-mask, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.login-popup-content {
+  background-color: $uni-bg-color;
+  padding: $uni-spacing-row-lg;
+  border-radius: $uni-border-radius-lg;
+  width: 80%;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-title {
+  font-size: $uni-font-size-lg;
+  color: $uni-text-color;
+  text-align: center;
+  margin-bottom: $uni-spacing-col-sm;
+  font-weight: bold;
+}
+
+.login-subtitle {
+  font-size: $uni-font-size-sm;
+  color: $uni-text-color-grey;
+  text-align: center;
+  margin-bottom: $uni-spacing-col-lg;
+}
+
+.login-input {
+  width: 90%;
+  height: 40px;
+  border: 1px solid $uni-border-color;
+  border-radius: $uni-border-radius-sm;
+  padding: 0 $uni-spacing-row-base;
+  margin-bottom: $uni-spacing-col-lg;
+  font-size: $uni-font-size-base;
+  background-color: $uni-bg-color-grey;
+  
+  &::placeholder {
+    color: $uni-text-color-placeholder;
+  }
+}
+
+.login-button {
+  width: 100%;
+  height: 40px;
+  background-color: $uni-color-primary;
+  border: none;
+  border-radius: $uni-border-radius-sm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  text {
+    color: $uni-text-color-inverse;
+    font-size: $uni-font-size-base;
+    font-weight: bold;
+  }
+  
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.otc-trading-pair-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.otc-trading-pair-title {
+  font-size: $font-size-xl;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.otc-history-link {
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
+  font-size: $font-size-base;
+
+  text {
+    margin-right: 5rpx;
+  }
+}
+
+// Add this mixin for the gradient
+@mixin button-gradient {
+  background: linear-gradient(to right, #fb5e2a, #feab61);
+  color: $uni-text-color-inverse;
+  border: none;
+  transition: opacity 0.3s ease;
+  border-radius: $uni-border-radius-lg;
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+// Update the existing button styles
+.uni-btn,
+.otc-action-buttons button,
+.btn-confirm,
+.login-button {
+  @include button-gradient;
+  border-radius: $uni-border-radius-base;
+  padding: 10px 20px;
+  font-size: $uni-font-size-base;
+  cursor: pointer;
+}
+
+// Update specific button styles
+.otc-action-buttons {
+  button {
+    &.btn-buy,
+    &.btn-sell {
+      @include button-gradient;
+    }
+  }
+}
+
+.currency-btn,
+.tab-btn {
+  &.active {
+    @include button-gradient;
+  }
+}
+
+// Update the login button style
+.login-button {
+  @include button-gradient;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  text {
+    color: $uni-text-color-inverse;
+    font-size: $uni-font-size-base;
+    font-weight: bold;
+  }
+}
+
+
+  .otc-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .otc-trading-pair {
+    margin-bottom: 1.25rem;
+  }
+
+  .otc-trade-form {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .otc-available-balance {
+    margin-bottom: $uni-font-size-base;
+    font-weight: normal;
+    color: #333;
+    text-align: right;
+  }
+
+  .otc-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    input {
+      flex: 1;
+      margin-right: 0.5rem;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.5rem;
+    }
+
+    .btn-max {
+      padding: 0.25rem 0.5rem;
+      background-color: $uni-color-primary;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+    }
+  }
+
+  .otc-slider-group {
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+
+    slider {
+      margin-top: 0.5rem;
+    }
+  }
+
+  .otc-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .otc-action-buttons {
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      
+      &.btn-buy {
+        background-color: #4cd964;
+      }
+      
+      &.btn-sell {
+        background-color: #ff3b30;
+      }
+    }
+  }
+
+  .otc-order-book {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .otc-order-book-header {
+      display: flex;
+      background-color: #f5f5f5;
+      border-radius: 4px 4px 0 0;
+      
+      .buy-header, .sell-header {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        font-weight: bold;
+        color: #333;
+      }
+    }
+
+    .otc-order-book-content {
+      display: flex;
+    }
+
+    .otc-buy-orders, .otc-sell-orders {
+      flex: 1;
+      
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        background-color: #f9f9f9;
+        font-weight: bold;
+        font-size: 0.9em;
+        color: #333;
+      }
+
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        font-size: 0.9em;
+      }
+    }
+
+    .otc-buy-orders {
+      border-right: 1px solid #e0e0e0;
+      
+      .order-item {
+        color: #4cd964;
+      }
+    }
+
+    .otc-sell-orders {
+      .order-item {
+        color: #ff3b30;
+      }
+    }
+
+    .otc-current-price {
+      text-align: center;
+      font-weight: bold;
+      padding: 0.5rem;
+      background-color: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
+      color: #ff3b30;
+    }
+  }
+
+
+.confirmation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmation-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 80%;
+  max-width: 300px;
+}
+
+.confirmation-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.confirmation-subtitle {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.confirmation-details {
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-cancel, .btn-confirm {
+  width: 45%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.btn-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-confirm {
+  background-color: $uni-color-primary;
+  color: #fff;
+}
+
+.result-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.result-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 80%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.result-icon {
+  margin-bottom: 20px;
+}
+
+.result-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.result-message {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-confirm {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: $uni-color-primary;
+  color: #fff;
+}
+
