@@ -11,6 +11,12 @@
       "style": {
         "navigationBarTitleText": "OTC Trading"
       }
+    },
+    {
+      "path": "pages/OTCTrading/OTCHistory",
+      "style": {
+        "navigationBarTitleText": "OTC History"
+      }
     }
   ],
   "globalStyle": {

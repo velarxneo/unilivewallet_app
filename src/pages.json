@@ -14,6 +14,13 @@
 			}
 		},
 		{
+			"path": "pages/OTCTrading/OTCHistory",
+			"style": {
+				"navigationBarTitleText": "OTC History",
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/OG/OG",
 			"style": {
 				"navigationBarTitleText": "OG"
@@ -31,6 +38,7 @@
 				"navigationBarTitleText": "Profile"
 			}
 		}
+		
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -39,41 +47,41 @@
 		"backgroundColor": "#F8F8F8"
 	},
 	"tabBar": {
-			"color": "#7A7E83",
-			"selectedColor": "#ff6b35",
-			"borderStyle": "black",
-			"backgroundColor": "#ffffff",
-			"list": [
-				{
-					"pagePath": "pages/index/index",
-					"iconPath": "static/tab-home.png",
-					"selectedIconPath": "static/tab-home-active.png",
-					"text": "首页"
-				},
-				{
-					"pagePath": "pages/OTCTrading/OTCTrading",
-					"iconPath": "static/tab-otc.png",
-					"selectedIconPath": "static/tab-otc-active.png",
-					"text": "OTC"
-				},
-				{
-					"pagePath": "pages/OG/OG",
-					"iconPath": "static/tab-og.png",
-					"selectedIconPath": "static/tab-og-active.png",
-					"text": "OG"
-				},
-				{
-					"pagePath": "pages/Mission/Mission",
-					"iconPath": "static/tab-mission.png",
-					"selectedIconPath": "static/tab-mission-active.png",
-					"text": "任务"
-				},
-				{
-					"pagePath": "pages/Profile/Profile",
-					"iconPath": "static/tab-profile.png",
-					"selectedIconPath": "static/tab-profile-active.png",
-					"text": "我的"
-				}
-			]
-		}
+		"color": "#7A7E83",
+		"selectedColor": "#ff6b35",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tab-home.png",
+				"selectedIconPath": "static/tab-home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/OTCTrading/OTCTrading",
+				"iconPath": "static/tab-otc.png",
+				"selectedIconPath": "static/tab-otc-active.png",
+				"text": "OTC"
+			},
+			{
+				"pagePath": "pages/OG/OG",
+				"iconPath": "static/tab-og.png",
+				"selectedIconPath": "static/tab-og-active.png",
+				"text": "OG"
+			},
+			{
+				"pagePath": "pages/Mission/Mission",
+				"iconPath": "static/tab-mission.png",
+				"selectedIconPath": "static/tab-mission-active.png",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/Profile/Profile",
+				"iconPath": "static/tab-profile.png",
+				"selectedIconPath": "static/tab-profile-active.png",
+				"text": "我的"
+			}
+		]
+	}
 }

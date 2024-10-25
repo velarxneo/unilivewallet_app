@@ -8,7 +8,7 @@
           <uni-icons type="forward" size="18"></uni-icons>
         </view>
       </view>
-      <view class="otc-pair-selector">
+      <view class="otc-order-selector">
         <text :class="{ active: selectedOrderType === 'BUY' }" @click="selectOrderType('BUY')">买入</text>
         <text :class="{ active: selectedOrderType === 'SELL' }" @click="selectOrderType('SELL')">卖出</text>
       </view>
@@ -168,6 +168,7 @@
 </template>
 
 <script>
+
 import { fetchOrderBook, fetchFeeConfiguration, fetchTransactionHistory, matchOrder } from '@/services/otcService';
 import { fetchUserBalances } from '@/services/userService';
 export default {
@@ -337,7 +338,9 @@ export default {
       }
     },
     goToHistory() {
-      // Navigate to history page
+      uni.navigateTo({
+        url: '/pages/OTCTrading/OTCHistory'
+      });
     },
     setBestPrice() {
       if (this.selectedOrderType === 'BUY') {
@@ -404,6 +407,9 @@ export default {
   }
 };
 </script>
+
+
+
 
 
 
