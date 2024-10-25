@@ -92,9 +92,15 @@ $uni-font-size-paragraph: 15px;
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the content horizontally */
   align-items: center;
+  position: relative; /* Position relative to allow absolute positioning of the button */
   margin-bottom: 16px;
+}
+
+.header button {
+  position: absolute;
+  left: 0; /* Align the button to the left */
 }
 
 .title {
@@ -136,24 +142,6 @@ $uni-font-size-paragraph: 15px;
 
 .order-details {
   margin-bottom: 8px;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.status {
-  &.in-progress {
-    color: orange;
-  }
-  &.cancelled {
-    color: red;
-  }
-  &.completed {
-    color: green;
-  }
 }
 
 .uni-card {
@@ -1007,6 +995,12 @@ page {
     color: red;
   }
   &.completed {
+    color: green;
+  }
+  &.open {
+    color: orange;
+  }
+  &.filled {
     color: green;
   }
 }
