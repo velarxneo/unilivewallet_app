@@ -628,88 +628,88 @@ page {
 }
 
 
-  .otc-header {
-    margin-bottom: 1.25rem;
+.otc-header {
+  margin-bottom: 1.25rem;
+}
+
+.otc-trading-pair {
+  margin-bottom: 1.25rem;
+}
+
+.otc-trade-form {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.otc-available-balance {
+  margin-bottom: $uni-font-size-base;
+  font-weight: normal;
+  color: #333;
+  text-align: right;
+}
+
+.otc-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  input {
+    flex: 1;
+    margin-right: 0.5rem;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
   }
 
-  .otc-trading-pair {
-    margin-bottom: 1.25rem;
+  .btn-max {
+    padding: 0.25rem 0.5rem;
+    background-color: $uni-color-primary;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
   }
+}
 
-  .otc-trade-form {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.otc-slider-group {
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+
+  slider {
+    margin-top: 0.5rem;
   }
+}
 
-  .otc-available-balance {
-    margin-bottom: $uni-font-size-base;
-    font-weight: normal;
-    color: #333;
-    text-align: right;
-  }
+.otc-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  color: #333;
+}
 
-  .otc-input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-
-    input {
-      flex: 1;
-      margin-right: 0.5rem;
-      background-color: white;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 0.5rem;
-    }
-
-    .btn-max {
-      padding: 0.25rem 0.5rem;
-      background-color: $uni-color-primary;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-    }
-  }
-
-  .otc-slider-group {
-    margin-bottom: 1rem;
-    padding: 0 0.5rem;
-
-    slider {
-      margin-top: 0.5rem;
-    }
-  }
-
-  .otc-total {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+.otc-action-buttons {
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
     font-weight: bold;
-    color: #333;
-  }
-
-  .otc-action-buttons {
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: white;
-      
-      &.btn-buy {
-        background-color: #4cd964;
-      }
-      
-      &.btn-sell {
-        background-color: #ff3b30;
-      }
+    color: white;
+    
+    &.btn-buy {
+      background-color: #4cd964;
+    }
+    
+    &.btn-sell {
+      background-color: #ff3b30;
     }
   }
+}
 
   .otc-order-book {
     background-color: rgba(255, 255, 255, 0.9);
@@ -898,3 +898,49 @@ page {
   color: #fff;
 }
 
+.transaction-history {
+  margin-top: 20px;
+}
+
+.history-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.transaction-item {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.transaction-details {
+  font-size: $uni-font-size-base;
+  color: #666;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.status {
+  &.in-progress {
+    color: orange;
+  }
+  &.cancelled {
+    color: red;
+  }
+  &.completed {
+    color: green;
+  }
+}

@@ -35,7 +35,7 @@ export default {
     async login() {
       if (this.userId.trim()) {
         try {
-          const response = await fetch(`http://localhost:8081/api/wallet/balances/user/${this.userId.trim()}`)
+          const response = await fetch(`http://localhost:8081/api/wallet/balances/user?userId=${this.userId.trim()}`)
           if (response.ok) {
             const balances = await response.json()
             localStorage.setItem('userId', this.userId.trim())

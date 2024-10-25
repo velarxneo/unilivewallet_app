@@ -1,13 +1,5 @@
 <template>
   <view class="uni-container">
-    <!-- <view class="otc-header">
-      <text class="otc-title">OTC</text>
-      <view class="otc-history-link" @click="goToHistory">
-        <text>历史订单</text>
-        <uni-icons type="forward" size="18"></uni-icons>
-      </view>
-    </view> -->
-    
     <view class="otc-trading-pair">
       <view class="otc-trading-pair-header">
         <text class="otc-trading-pair-title">SEE/USDT</text>
@@ -88,7 +80,48 @@
         <text>{{ parseFloat(currentPrice).toFixed(4).padEnd(4, '0') }} USDT</text>
       </view>
     </view>
-    
+
+    <!-- Transaction History Section -->
+    <view class="transaction-history">
+      <text class="history-title">最新成交记录</text>
+      <view v-for="(transaction, index) in transactionHistory" :key="'transaction-' + index" class="transaction-item">
+        <view class="transaction-header">
+          <text>{{ transaction.orderType === 'BUY' ? '买入' : '卖出' }}</text>
+          <text>SEE: {{ transaction.qty.toFixed(0) }}</text>
+        </view>
+        <view class="transaction-details">
+          <view class="detail-row">
+            <text>交易时间</text>
+            <text>{{ new Date(transaction.transactionDate).toLocaleString() }}</text>
+          </view>
+          <view class="detail-row">
+            <text>状态</text>
+            <text :class="['status', {
+              'in-progress': transaction.transactionType === 'CREATE',
+              'cancelled': transaction.transactionType === 'CANCEL',
+              'completed': transaction.transactionType === 'FILL'
+            }]">
+              {{ transaction.transactionType === 'CREATE' ? '进行中' :
+                 transaction.transactionType === 'CANCEL' ? '已取消' :
+                 transaction.transactionType === 'FILL' ? '已完成' : '未知状态' }}
+            </text>
+          </view>
+          <view class="detail-row">
+            <text>挂单价格</text>
+            <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
+          </view>
+          <view class="detail-row">
+            <text>成交数量</text>
+            <text>{{ transaction.qty.toFixed(4).padEnd(4, '0') }}</text>
+          </view>
+          <view class="detail-row">
+            <text>成交价格</text>
+            <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- Confirmation Popup -->
     <view v-if="showConfirmationPopup" class="confirmation-popup">
       <view class="confirmation-content">
@@ -135,6 +168,8 @@
 </template>
 
 <script>
+import { fetchOrderBook, fetchFeeConfiguration, fetchTransactionHistory, matchOrder } from '@/services/otcService';
+import { fetchUserBalances } from '@/services/userService';
 export default {
   data() {
     return {
@@ -155,6 +190,7 @@ export default {
       transactionSuccess: false,
       resultMessage: '',
       sliderValue: 0,
+      transactionHistory: [], // Add this line
     };
   },
   computed: {
@@ -217,10 +253,7 @@ export default {
   methods: {
     async fetchOrderBook() {
       try {
-        const response = await fetch('http://localhost:8081/api/otc/orderbook/SEE/USDT');
-        const data = await response.json();
-        this.orderBook = data;
-        // Set the initial best price after fetching the order book
+        this.orderBook = await fetchOrderBook();
         this.setBestPrice();
       } catch (error) {
         console.error('Error fetching order book:', error);
@@ -230,12 +263,7 @@ export default {
       const userId = localStorage.getItem('userId');
       if (userId) {
         try {
-          const response = await fetch(`http://localhost:8081/api/wallet/balances/user/${userId}`);
-          if (response.ok) {
-            this.userBalances = await response.json();
-          } else {
-            throw new Error('Failed to fetch user balances');
-          }
+          this.userBalances = await fetchUserBalances(userId);
         } catch (error) {
           console.error('Error fetching user balances:', error);
         }
@@ -248,13 +276,8 @@ export default {
     },
     async fetchFeeConfiguration() {
       try {
-        const response = await fetch('http://localhost:8081/api/get-fee-configuration/TRADE');
-        if (response.ok) {
-          const data = await response.json();
-          this.feeConfiguration = data[0];
-        } else {
-          throw new Error('Failed to fetch fee configuration');
-        }
+        const data = await fetchFeeConfiguration();
+        this.feeConfiguration = data[0];
       } catch (error) {
         console.error('Error fetching fee configuration:', error);
       }
@@ -277,7 +300,6 @@ export default {
         return;
       }
 
-      // Set expiration date to one year from now
       const oneYearFromNow = new Date();
       oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
@@ -292,27 +314,16 @@ export default {
       };
 
       try {
-        const response = await fetch('http://localhost:8081/api/otc/match', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        const result = await response.json();
-
-        this.transactionSuccess = response.ok;
-        this.resultMessage = response.ok ? '您可以在我的订单中查看' : '该订单已被其他人成交';
-        this.showResultPopup = true;
+        const result = await matchOrder(requestBody);
+        this.transactionSuccess = true;
+        this.resultMessage = '您可以在我的订单中查看';
       } catch (error) {
-        console.error('Error placing order:', error);
         this.transactionSuccess = false;
         this.resultMessage = '交易过程中发生错误，请稍后重试';
+      } finally {
         this.showResultPopup = true;
+        this.showConfirmationPopup = false;
       }
-
-      this.showConfirmationPopup = false;
     },
     closeResultPopup() {
       this.showResultPopup = false;
@@ -322,6 +333,7 @@ export default {
         this.price = '';
         this.fetchOrderBook();
         this.fetchUserBalances();
+        this.fetchTransactionHistory();
       }
     },
     goToHistory() {
@@ -365,6 +377,20 @@ export default {
         }
       }
     },
+    async fetchTransactionHistory() {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error('User ID not found');
+        return;
+      }
+
+      try {
+        const data = await fetchTransactionHistory(userId);
+        this.transactionHistory = data.content;
+      } catch (error) {
+        console.error('Error fetching transaction history:', error);
+      }
+    },
   },
   mounted() {
     this.fetchOrderBook();
@@ -373,11 +399,20 @@ export default {
     this.$root.$on('userLoggedIn', (userId, balances) => {
       this.userBalances = balances;
     });
-    // Set the initial best price
     this.setBestPrice();
+    this.fetchTransactionHistory();
   }
 };
 </script>
+
+
+
+
+
+
+
+
+
 
 
 
