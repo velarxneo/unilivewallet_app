@@ -1,5 +1,11 @@
 <template>
   <view class="uni-container">
+    <view class="header">
+      <text class="uni-title">OTC</text>
+      <view class="settings-icon">
+        <!-- <uni-icons type="gear" size="24" color="#fff"></uni-icons> -->
+      </view>
+    </view>
     <view class="otc-trading-pair">
       <view class="otc-trading-pair-header">
         <text class="otc-trading-pair-title">SEE/USDT</text>
@@ -153,25 +159,25 @@
       </view>
     </view>
 
-    <!-- Transaction Result Popup -->
-    <view v-if="showResultPopup" class="result-popup">
-      <view class="result-content">
-        <view class="result-icon">
-          <uni-icons :type="transactionSuccess ? 'checkmarkempty' : 'closeempty'" size="60" :color="transactionSuccess ? '#4cd964' : '#dd524d'"></uni-icons>
-        </view>
-        <text class="result-title">{{ transactionSuccess ? '交易成功' : '交易失败' }}</text>
-        <text class="result-message">{{ resultMessage }}</text>
-        <button class="btn-confirm" @click="closeResultPopup">我知道了</button>
-      </view>
-    </view>
+    <!-- Use the new ResultPopup component -->
+    <ResultPopup 
+      :show="showResultPopup"
+      :success="transactionSuccess"
+      :message="resultMessage"
+      @close="closeResultPopup"
+    />
   </view>
 </template>
 
 <script>
-
+import ResultPopup from '@/components/ResultPopup.vue';
 import { fetchOrderBook, fetchFeeConfiguration, fetchTransactionHistory, matchOrder } from '@/services/otcService';
 import { fetchUserBalances } from '@/services/userService';
+
 export default {
+  components: {
+    ResultPopup
+  },
   data() {
     return {
       DECIMAL_PLACES: 4, // Define a constant for decimal places
@@ -293,6 +299,9 @@ export default {
     },
     cancelConfirmation() {
       this.showConfirmationPopup = false;
+      this.transactionSuccess = false;
+      this.resultMessage = '您已取消交易';
+      this.showResultPopup = true;
     },
     async confirmOrder() {
       const userId = localStorage.getItem('userId');
@@ -322,8 +331,8 @@ export default {
         this.transactionSuccess = false;
         this.resultMessage = '交易过程中发生错误，请稍后重试';
       } finally {
-        this.showResultPopup = true;
         this.showConfirmationPopup = false;
+        this.showResultPopup = true;
       }
     },
     closeResultPopup() {
@@ -407,22 +416,3 @@ export default {
   }
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

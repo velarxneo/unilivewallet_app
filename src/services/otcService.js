@@ -61,3 +61,44 @@ export async function matchOrder(requestBody) {
         throw error;
     }
 }
+
+export async function fetchTransactionDetails(userId, orderId) {
+  try {
+    const response = await fetch(`http://localhost:8081/api/otc/transactions/user?userId=${userId}&page=0&size=10&orderId=${orderId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transaction details:', error);
+    throw error;
+  }
+}
+
+export async function fetchOrderHistory(userId, currentPage, pageSize, orderType, status) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/otc/orders/user?userId=${userId}&page=${currentPage}&size=${pageSize}&orderType=${orderType}&status=${status}&sort=createdAt,desc`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching order history:', error);
+    throw error;
+  }
+}
+
+export async function cancelOrder(orderId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/otc/cancel?orderId=${orderId}`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    throw error;
+  }
+}

@@ -153,8 +153,9 @@ $uni-font-size-paragraph: 15px;
 }
 
 .uni-title {
-  font-size: 2rem;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  color: #FFFFFF; // White color for the title
 }
 
 .uni-subtitle {
@@ -330,7 +331,7 @@ $uni-font-size-paragraph: 15px;
 /* Colors */
 $primary-color: #FF6B6B;
 $secondary-color: #FF3B30;
-$background-color: #FFFFFF;
+$background-color: #FF6B35; // Update this to match the orange background in the image
 $text-color: #333333;
 $light-text-color: #999999;
 
@@ -348,7 +349,8 @@ $spacing-small: 10rpx;
 $spacing-base: 20rpx;
 
 /* Border radius */
-$border-radius: 5rpx;
+$border-radius-small: 5px;
+$border-radius-base: 10px;
 
 /* Global styles */
 page {
@@ -496,33 +498,6 @@ page {
         margin-left: 20rpx;
       }
     }
-  }
-}
-
-.otc-order-list {
-  display: flex;
-  
-  .buy-orders, .sell-orders {
-    flex: 1;
-    padding: 10rpx; // Added padding
-  }
-  
-  .order-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.625rem 0; // 10px
-    
-    text {
-      font-size: $font-size-base;
-    }
-  }
-  
-  .buy-orders .order-item {
-    color: $uni-color-success;
-  }
-  
-  .sell-orders .order-item {
-    color: $uni-color-warning;
   }
 }
 
@@ -997,10 +972,68 @@ page {
   &.completed {
     color: green;
   }
-  &.open {
-    color: orange;
-  }
   &.filled {
     color: green;
   }
+  &.open {
+    color: orange;
+  }
+  &.partially_filled {
+    color: orange;
+  }
 }
+
+.order-actions-wrapper{
+  font-size: $uni-font-size-sm;
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-top: 20px;
+  width: 100%;
+}
+
+.order-actions {
+  font-size: $uni-font-size-sm;
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px;
+  width:auto;
+}
+
+.order-actions button {
+  padding: 0px 25px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  width: auto; // Add this line
+}
+
+.order-actions button:first-child {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.order-actions button:last-child {
+  background-color: #ff6b35;
+  color: #fff;
+}
+
+.back-button {
+  background-color: transparent;
+  border: none;
+  color: #000;
+  font-size: 24px;
+  padding: 10px;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  margin-bottom: 5px;
+  transform: translateY(-50%);
+}
+
+.loading-indicator,
+.end-of-list {
+  text-align: center;
+  padding: 10px;
+  color: $uni-text-color-grey;
+}
+

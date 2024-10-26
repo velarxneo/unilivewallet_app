@@ -35,7 +35,15 @@
 		{
 			"path": "pages/Profile/Profile",
 			"style": {
-				"navigationBarTitleText": "Profile"
+				"navigationBarTitleText": "Profile",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/OTCTrading/TransactionDetails",
+			"style": {
+				"navigationBarTitleText": "交易明细",
+				"navigationStyle": "custom"
 			}
 		}
 		

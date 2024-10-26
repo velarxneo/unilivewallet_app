@@ -13,10 +13,10 @@ export default {
   data() {
     return {
       menuItems: [
-        { text: '首页', icon: '/static/icons/home.png', path: '/pages/index/index' },
+        // { text: '首页', icon: '/static/icons/home.png', path: '/pages/index/index' },
         { text: 'OTC', icon: '/static/icons/otc.png', path: '/pages/OTCTrading/OTCTrading' },
-        { text: 'OG', icon: '/static/icons/og.png', path: '/pages/OG/OG' },
-        { text: '任务', icon: '/static/icons/task.png', path: '/pages/Mission/Mission' },
+        // { text: 'OG', icon: '/static/icons/og.png', path: '/pages/OG/OG' },
+        // { text: '任务', icon: '/static/icons/task.png', path: '/pages/Mission/Mission' },
         { text: '我的', icon: '/static/icons/profile.png', path: '/pages/Profile/Profile' },
       ]
     }
@@ -43,7 +43,7 @@ export default {
   justify-content: space-around;
   align-items: center;
   height: 100rpx;
-  background-color: $background-color;
+  background-color: #FFFFFF;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
 }
 
