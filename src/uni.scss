@@ -83,7 +83,7 @@ $uni-font-size-paragraph: 15px;
   padding: 20px;
   padding-bottom: 80px;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f85634 0%, #f85634 10%, white 30%);
+  background: linear-gradient(to bottom, #f85634 0%, #f85634 10%, $uni-bg-color 30%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   display: flex;
@@ -1036,4 +1036,194 @@ page {
   padding: 10px;
   color: $uni-text-color-grey;
 }
+
+// Add these styles at the end of the existing uni.scss file
+
+.profile-container {
+  padding: 20px;
+  background-color: $background-color;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.uni-title {
+  font-size: $font-size-xxl;
+  font-weight: bold;
+  color: #fff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  margin-right: 15px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: $font-size-lg;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.user-level {
+  display: flex;
+  align-items: center;
+}
+
+.level-text {
+  font-size: $font-size-sm;
+  color: #FFD700;
+  margin-left: 5px;
+}
+
+.wallet-card {
+  background: linear-gradient(to right, #000000 0%, #f85634 100%);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.wallet-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.wallet-title, .wallet-network {
+  font-size: $font-size-sm;
+  color: #fff;
+}
+
+.wallet-balance {
+  font-size: $font-size-xxl;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.wallet-address {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  gap: 10px;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1); // Add a light border
+  
+  uni-icons {
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 10px;
+    margin-bottom: 5px;
+   
+  }
+  
+  text {
+    color: $text-color;
+    font-size: $font-size-xs;
+  }
+}
+
+.asset-list {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.asset-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid $uni-border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.asset-name {
+  font-size: $font-size-base;
+  font-weight: bold;
+  color: $text-color;
+  margin-left: 10px;
+  flex: 1;
+}
+
+.asset-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 10px;
+}
+
+.asset-row {
+  display: flex;
+  align-items: center;
+}
+
+.asset-label {
+  font-size: $font-size-xs;
+  color: $light-text-color;
+  margin-right: 5px;
+}
+
+.asset-value {
+  font-size: $font-size-sm;
+  color: $text-color;
+}
+
+.action-list {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.action-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+}
+
+.action-text {
+  font-size: $font-size-base;
+  color: $text-color;
+}
+
+
+
 

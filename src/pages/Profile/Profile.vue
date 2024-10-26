@@ -1,17 +1,16 @@
 <template>
   <view class="uni-container">
     <view class="header">
-      <view class="back-button-placeholder"></view>
       <text class="uni-title">我的</text>
       <view class="settings-icon">
-        <!-- <uni-icons type="gear" size="24" color="#fff"></uni-icons> -->
+        <uni-icons type="gear" size="24" color="#fff"></uni-icons>
       </view>
     </view>
     
     <view class="user-info">
       <image class="avatar" src="/static/images/default-avatar.png" mode="aspectFill"></image>
       <view class="user-details">
-        <text class="username">Jason</text>
+        <text class="username">{{ userId }}</text>
         <view class="user-level">
           <uni-icons type="medal" size="16" color="#FFD700"></uni-icons>
           <text class="level-text">创世OG</text>
@@ -22,44 +21,53 @@
     <view class="wallet-card">
       <view class="wallet-header">
         <text class="wallet-title">钱包总资产 (USDT)</text>
-        <text class="wallet-address">网络: BSC/BEP20</text>
+        <text class="wallet-network">网络: BSC/BEP20</text>
       </view>
-      <text class="wallet-balance">102.016</text>
-      <text class="wallet-address">钱包地址: 0xCB853E7A...GCsc5AD0267</text>
+      <text class="wallet-balance">{{ usdtWalletBalance }}</text>
+      <text class="wallet-address">钱包地址: {{ truncatedAddress }}</text>
+    </view>
+    
+    <view class="quick-actions">
+      <view class="action-item" @click="handleAction('transfer')">
+        <uni-icons type="redo-filled" size="24" color="#333"></uni-icons>
+        <text>转账</text>
+      </view>
+      <view class="action-item" @click="handleAction('receive')">
+        <uni-icons type="download-filled" size="24" color="#333"></uni-icons>
+        <text>收款</text>
+      </view>
+      <view class="action-item" @click="handleAction('exchange')">
+        <uni-icons type="loop" size="24" color="#333"></uni-icons>
+        <text>划转</text>
+      </view>
+      <view class="action-item" @click="handleAction('refresh')">
+        <uni-icons type="refresh" size="24" color="#333"></uni-icons>
+        <text>闪兑</text>
+      </view>
     </view>
     
     <view class="asset-list">
-      <view class="asset-item">
-        <uni-icons type="wallet" size="24" color="#4CD964"></uni-icons>
-        <text class="asset-name">USDT</text>
+      <view v-for="balance in balances" :key="balance.tokenSymbol" class="asset-item">
+        <uni-icons :type="balance.tokenSymbol === 'USDT' ? 'wallet' : 'wallet'" :size="24" :color="balance.tokenSymbol === 'USDT' ? '#4CD964' : '#007AFF'"></uni-icons>
+        <text class="asset-name">{{ balance.tokenSymbol }}</text>
         <view class="asset-details">
-          <text class="asset-label">冻结</text>
-          <text class="asset-value">0.000</text>
+          <view class="asset-row">
+            <text class="asset-label">冻结</text>
+            <text class="asset-value">{{ balance.lockedWalletBalance }}</text>
+          </view>
+          <view class="asset-row">
+            <text class="asset-label">可用</text>
+            <text class="asset-value">{{ balance.walletBalance - balance.lockedWalletBalance }}</text>
+          </view>
         </view>
-        <view class="asset-details">
-          <text class="asset-label">可用</text>
-          <text class="asset-value">0.000</text>
-        </view>
-      </view>
-      <view class="asset-item">
-        <uni-icons type="wallet" size="24" color="#007AFF"></uni-icons>
-        <text class="asset-name">SEE</text>
-        <view class="asset-details">
-          <text class="asset-label">冻结</text>
-          <text class="asset-value">0.000</text>
-        </view>
-        <view class="asset-details">
-          <text class="asset-label">可用</text>
-          <text class="asset-value">0.000</text>
-        </view>
-        <text class="asset-usd-value">≈USDT 0.000</text>
+        <uni-icons type="right" size="16" color="#999"></uni-icons>
       </view>
     </view>
     
     <view class="action-list">
       <view class="action-item" @click="navigateTo('/pages/OTCTrading/OTCHistory')">
         <text class="action-text">问题工单</text>
-        <uni-icons type="forward" size="16" color="#999"></uni-icons>
+        <uni-icons type="right" size="16" color="#999"></uni-icons>
       </view>
     </view>
     
@@ -69,171 +77,68 @@
 
 <script>
 import BottomMenu from '@/components/BottomMenu.vue';
+import { fetchUserBalancesWithDetails } from '@/services/userService';
 
 export default {
   name: 'Profile',
   components: {
     BottomMenu
   },
+  data() {
+    return {
+      userId: '',
+      address: '',
+      balances: [],
+      usdtWalletBalance: '0',
+      truncatedAddress: ''
+    };
+  },
+  mounted() {
+    this.fetchUserData();
+  },
   methods: {
     navigateTo(url) {
       uni.navigateTo({ url });
+    },
+    async fetchUserData() {
+      try {
+        const userId = 'user1'; // Replace this with actual user ID retrieval logic
+        const userData = await fetchUserBalancesWithDetails(userId);
+        this.userId = userData.userId;
+        this.address = userData.address;
+        this.balances = userData.balances;
+        this.usdtWalletBalance = userData.usdtWalletBalance;
+        this.truncatedAddress = this.truncateAddress(userData.address);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    },
+    truncateAddress(address) {
+      if (address.length > 15) {
+        return `${address.slice(0, 8)}...${address.slice(-8)}`;
+      }
+      return address;
+    },
+    handleAction(action) {
+      switch (action) {
+        case 'transfer':
+          console.log('Transfer action clicked');
+          // Implement transfer logic or navigation
+          break;
+        case 'receive':
+          console.log('Receive action clicked');
+          // Implement receive logic or navigation
+          break;
+        case 'exchange':
+          console.log('Exchange action clicked');
+          // Implement exchange logic or navigation
+          break;
+        case 'refresh':
+          console.log('Refresh action clicked');
+          // Implement refresh logic or navigation
+          break;
+      }
     }
   }
-}
+};
 </script>
-
-<style lang="scss">
-@import "../../uni.scss";
-
-.profile-container {
-  padding: 20px;
-  background-color: $background-color;
-  min-height: 100vh;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.title {
-  font-size: $font-size-xxl;
-  font-weight: bold;
-  color: #fff;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  margin-right: 15px;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.username {
-  font-size: $font-size-lg;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 5px;
-}
-
-.user-level {
-  display: flex;
-  align-items: center;
-}
-
-.level-text {
-  font-size: $font-size-sm;
-  color: #FFD700;
-  margin-left: 5px;
-}
-
-.wallet-card {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-}
-
-.wallet-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.wallet-title {
-  font-size: $font-size-base;
-  color: $text-color;
-}
-
-.wallet-balance {
-  font-size: $font-size-xxl;
-  font-weight: bold;
-  color: $text-color;
-  margin-bottom: 10px;
-}
-
-.wallet-address {
-  font-size: $font-size-xs;
-  color: $light-text-color;
-}
-
-.asset-list {
-  margin-bottom: 20px;
-}
-
-.asset-item {
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 10px;
-}
-
-.asset-name {
-  font-size: $font-size-base;
-  font-weight: bold;
-  color: $text-color;
-  margin-left: 10px;
-  flex: 1;
-}
-
-.asset-details {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-left: 10px;
-}
-
-.asset-label {
-  font-size: $font-size-xs;
-  color: $light-text-color;
-}
-
-.asset-value {
-  font-size: $font-size-sm;
-  color: $text-color;
-}
-
-.asset-usd-value {
-  font-size: $font-size-xs;
-  color: $light-text-color;
-  margin-left: 10px;
-}
-
-.action-list {
-  background-color: #fff;
-  border-radius: 10px;
-}
-
-.action-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid $uni-border-color;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.action-text {
-  font-size: $font-size-base;
-  color: $text-color;
-}
-</style>

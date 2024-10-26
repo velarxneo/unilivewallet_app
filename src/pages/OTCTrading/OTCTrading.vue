@@ -22,7 +22,7 @@
     
     <view class="otc-trade-form">
       <view class="otc-available-balance">
-        <text>余额: {{ parseFloat(availableBalance).toFixed(4).padEnd(4, '0') }} {{ selectedOrderType === 'BUY' ? 'USDT' : 'SEE' }}</text>
+        <text>余额: {{ availableBalance }} {{ selectedOrderType === 'BUY' ? 'USDT' : 'SEE' }}</text>
       </view>
       <view class="otc-input-group">
         <text>价格</text>
@@ -198,6 +198,7 @@ export default {
       resultMessage: '',
       sliderValue: 0,
       transactionHistory: [], // Add this line
+      orderType: 'BUY', // Add this line
     };
   },
   computed: {
@@ -208,12 +209,9 @@ export default {
       const balanceCurrency = this.selectedOrderType === 'BUY' ? 'USDT' : 'SEE';
       const balance = this.userBalances.find(b => b.tokenSymbol === balanceCurrency);
       if (balance) {
-        return (parseFloat(balance.otcBalance) - parseFloat(balance.lockedOtcBalance)).toString();
+        return (parseFloat(balance.otcBalance) - parseFloat(balance.lockedOtcBalance)).toFixed(4);
       }
       return '0.0000';
-    },
-    orderType() {
-      return this.selectedOrderType === 'BUY' ? '买入' : '卖出';
     },
     confirmationTitle() {
       return this.selectedOrderType === 'BUY' ? '买SEE' : '卖SEE';
@@ -290,7 +288,7 @@ export default {
       }
     },
     showConfirmation(type) {
-      this.orderType = type;
+      this.orderType = type === 'BUY' ? '买入' : '卖出'; // Update this line
       console.log(this.orderType);
       console.log(this.fee);
       console.log(this.actualAmount);
@@ -416,3 +414,4 @@ export default {
   }
 };
 </script>
+
