@@ -95,3 +95,16 @@ export async function transferToUserId(senderUserId, recipientUserId, tokenSymbo
     throw error;
   }
 }
+
+export async function fetchTokenTransactions(userId, tokenSymbol, page, size) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet/transactions/user?userId=${userId}&tokenSymbol=${tokenSymbol}&page=${page}&size=${size}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch token transactions');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching token transactions:', error);
+    throw error;
+  }
+}

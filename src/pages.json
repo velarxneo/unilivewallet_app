@@ -52,8 +52,14 @@
 				"navigationBarTitleText": "转账",
 				"navigationStyle": "custom"
 			}
+		},
+		{
+			"path": "pages/Wallet/TokenTransaction",
+			"style": {
+				"navigationBarTitleText": "代币交易",
+				"navigationStyle": "custom"
+			}
 		}
-		
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

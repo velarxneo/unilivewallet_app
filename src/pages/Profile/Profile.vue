@@ -47,7 +47,7 @@
     </view>
     
     <view class="asset-list">
-      <view v-for="balance in balances" :key="balance.tokenSymbol" class="asset-item">
+      <view v-for="balance in balances" :key="balance.tokenSymbol" class="asset-item" @click="showTokenDetails(balance)">
         <uni-icons :type="balance.tokenSymbol === 'USDT' ? 'wallet' : 'wallet'" :size="24" :color="balance.tokenSymbol === 'USDT' ? '#4CD964' : '#007AFF'"></uni-icons>
         <text class="asset-name">{{ balance.tokenSymbol }}</text>
         <view class="asset-details">
@@ -155,6 +155,21 @@ export default {
           // Implement refresh logic or navigation
           break;
       }
+    },
+    showTokenDetails(balance) {
+      uni.navigateTo({
+        url: `/pages/Wallet/TokenTransaction?userId=${this.userId}&tokenSymbol=${balance.tokenSymbol}&tokenBalance=${balance.walletBalance}`,
+        success: function() {
+          console.log('Navigation to TokenTransaction page successful');
+        },
+        fail: function(error) {
+          console.error('Navigation to TokenTransaction page failed:', error);
+          uni.showToast({
+            title: 'Failed to open TokenTransaction page',
+            icon: 'none'
+          });
+        }
+      });
     }
   }
 };
