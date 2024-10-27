@@ -43,3 +43,55 @@ function calculateUsdtWalletBalance(balances) {
   }
   return '0.000000';
 }
+
+export async function transferToAddress(senderUserId, recipientAddress, tokenSymbol, qty) {
+  try {
+    const response = await fetch('http://localhost:8081/api/wallet/send-to-address', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        senderUserId,
+        recipientAddress,
+        tokenSymbol,
+        qty
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '转账失败');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function transferToUserId(senderUserId, recipientUserId, tokenSymbol, qty) {
+  try {
+    const response = await fetch('http://localhost:8081/api/wallet/send-to-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        senderUserId,
+        recipientUserId,
+        tokenSymbol,
+        qty
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '转账失败');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}

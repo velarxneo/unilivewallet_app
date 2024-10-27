@@ -301,7 +301,7 @@ export default {
       this.showConfirmationPopup = false;
       this.transactionSuccess = false;
       this.resultMessage = '您已取消交易';
-      this.showResultPopup = true;
+      this.showResultPopup = false;
     },
     async confirmOrder() {
       const userId = localStorage.getItem('userId');

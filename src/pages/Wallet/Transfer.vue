@@ -60,17 +60,17 @@
       <view class="confirmation-content">
         <view class="confirmation-title">转账信息</view>
         <view class="confirmation-details">
-          <view class="detail-item">
+          <view class="detail-item-column">
             <text>{{ transferType === 'address' ? '钱包地址' : '用户ID' }}</text>
             <text class="full-text">{{ recipient }}</text>
           </view>
-          <view class="detail-item">
+          <view class="detail-item-column">
             <text>代币类型</text>
             <text>{{ selectedToken }}</text>
           </view>
-          <view class="detail-item">
+          <view class="detail-item-column">
             <text>转账数量</text>
-            <text>{{ amount }}</text>
+            <text>{{ parseFloat(amount).toFixed(4).padEnd(4, '0')  || '0.0000' }}</text>
           </view>
         </view>
         <view class="confirmation-buttons">
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { fetchUserBalancesWithDetails } from '@/services/userService';
+import { fetchUserBalancesWithDetails, transferToAddress, transferToUserId } from '@/services/userService';
 import ResultPopup from '@/components/ResultPopup.vue';
 
 export default {
@@ -164,64 +164,42 @@ export default {
     },
     cancelConfirmation() {
       this.showConfirmationPopup = false;
+      // Don't show any result popup when cancelling
     },
     async confirmTransfer() {
       this.showConfirmationPopup = false;
-      if (this.transferType === 'address') {
-        await this.transferToAddress();
-      } else {
-        await this.transferToUserId();
+      try {
+        let result;
+        if (this.transferType === 'address') {
+          result = await this.transferToAddress();
+        } else {
+          result = await this.transferToUserId();
+        }
+        
+        if (result && result.success) {
+          this.showTransferResult(true, '转账成功');
+        } else {
+          throw new Error(result.message || '转账失败');
+        }
+      } catch (error) {
+        this.showTransferResult(false, error.message);
       }
     },
     async transferToAddress() {
-      try {
-        const response = await fetch('http://localhost:8081/api/wallet/send-to-address', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            senderUserId: this.userId,
-            recipientAddress: this.recipient,
-            tokenSymbol: this.selectedToken,
-            qty: parseFloat(this.amount)
-          })
-        });
-        
-        if (response.ok) {
-          this.showTransferResult(true, '转账成功');
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message || '转账失败');
-        }
-      } catch (error) {
-        this.showTransferResult(false, error.message);
-      }
+      return await transferToAddress(
+        this.userId,
+        this.recipient,
+        this.selectedToken,
+        parseFloat(this.amount)
+      );
     },
     async transferToUserId() {
-      try {
-        const response = await fetch('http://localhost:8081/api/wallet/send-to-user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            senderUserId: this.userId,
-            recipientUserId: this.recipient,
-            tokenSymbol: this.selectedToken,
-            qty: parseFloat(this.amount)
-          })
-        });
-        
-        if (response.ok) {
-          this.showTransferResult(true, '转账成功');
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message || '转账失败');
-        }
-      } catch (error) {
-        this.showTransferResult(false, error.message);
-      }
+      return await transferToUserId(
+        this.userId,
+        this.recipient,
+        this.selectedToken,
+        parseFloat(this.amount)
+      );
     },
     showTransferResult(success, message) {
       this.transactionSuccess = success;
@@ -256,83 +234,3 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-// ... (previous styles remain the same) ...
-
-.confirmation-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.confirmation-content {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  width: 80%;
-  max-width: 300px;
-}
-
-.confirmation-title {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.confirmation-details {
-  margin-bottom: 20px;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-  
-  text:first-child {
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 5px;
-  }
-  
-  text:last-child {
-    font-weight: bold;
-    word-break: break-all;
-  }
-}
-
-.full-text {
-  font-size: 12px;
-  word-break: break-all;
-}
-
-.confirmation-buttons {
-  display: flex;
-  justify-content: space-between;
-}
-
-.btn-cancel, .btn-confirm {
-  width: 45%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-}
-
-.btn-cancel {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.btn-confirm {
-  background-color: $uni-color-primary;
-  color: #fff;
-}
-</style>
