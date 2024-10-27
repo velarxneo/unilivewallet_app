@@ -122,6 +122,33 @@ $uni-font-size-paragraph: 15px;
   font-weight: bold;
 }
 
+.info {
+  font-size: 14px;
+  color: $uni-text-color;
+  line-height: 1.5;
+
+  text {
+    display: block;
+    margin-bottom: 8px;
+    padding-left: 15px;
+    position: relative;
+
+    &::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+    }
+  }
+}
+
+.balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: $uni-text-color;
+}
+
 .order-list {
   margin-top: 16px;
 }
@@ -229,24 +256,6 @@ $uni-font-size-paragraph: 15px;
         background-color: $uni-color-primary;
         color: $uni-text-color-inverse;
       }
-    }
-  }
-
-  .input-group {
-    margin-bottom: 15px;
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: $uni-text-color-grey;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid $uni-border-color;
-      border-radius: $uni-border-radius-base;
-      font-size: $uni-font-size-base;
     }
   }
 
@@ -359,6 +368,70 @@ page {
   line-height: 1.5;
 }
 
+
+.section {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  margin-bottom: 15px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+
+  text {
+    display: block;
+    margin-bottom: 5px;
+    color: $uni-text-color;
+    padding-bottom: 10px;
+  }
+
+  input {
+    flex: 1;
+    width: auto;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid $uni-border-color;
+    border-radius: $uni-border-radius-base;
+    font-size: $uni-font-size-base;
+    background-color: $uni-bg-color;
+  }
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.picker {
+  width: 100px;
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.btn-max {
+ 
+  background-color: $uni-color-primary;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+}
+
 /* You can add more global styles here */
 
 // OTC Trading styles
@@ -397,7 +470,7 @@ page {
 
 .otc-order-selector {
   display: flex;
-  background-color: $uni-bg-color-grey;
+  background-color: $uni-bg-color;
   border-radius: 15rpx;
   overflow: hidden;
   font-weight: bold;
@@ -420,20 +493,6 @@ page {
   border-radius: 10rpx;
   padding: 20rpx;
   margin-bottom: 20rpx;
-}
-
-.otc-input-group {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.875rem; // 30px
-  
-  input {
-    flex: 1;
-    border: 1px solid $uni-border-color;
-    border-radius: 5rpx;
-    padding: 0.9375rem; // 15px
-    margin: 0 10rpx;
-  }
 }
 
 .otc-total-price {
@@ -611,13 +670,21 @@ page {
   }
 }
 
+.all-button {
+  color: #007AFF;
+}
+
+.footer {
+  padding: 20px;
+}
+
 // Update the existing button styles
 .uni-btn,
 .otc-action-buttons button,
 .btn-confirm,
 .login-button {
   @include button-gradient;
-  border-radius: $uni-border-radius-base;
+  border-radius: $uni-border-radius-lg;
   padding: 10px 20px;
   font-size: $uni-font-size-base;
   cursor: pointer;
@@ -678,29 +745,6 @@ page {
   font-weight: normal;
   color: #333;
   text-align: right;
-}
-
-.otc-input-group {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-
-  input {
-    flex: 1;
-    margin-right: 0.5rem;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 0.5rem;
-  }
-
-  .btn-max {
-    padding: 0.25rem 0.5rem;
-    background-color: $uni-color-primary;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-  }
 }
 
 .otc-slider-group {
@@ -1045,13 +1089,6 @@ page {
   min-height: 100vh;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 .uni-title {
   font-size: $font-size-xxl;
   font-weight: bold;
@@ -1224,6 +1261,34 @@ page {
   color: $text-color;
 }
 
+.transfer-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+  width: 100%;
+}
+
+.transfer-type-selector {
+  display: flex;
+  background-color: $uni-bg-color;
+  border-radius: 15rpx;
+  overflow: hidden;
+  font-weight: bold;
+  padding: 5rpx;
+  width: 100%;
+  text {
+    flex: 1;
+    text-align: center;
+    padding: 0.50rem 0; // 10px
+    
+    &.active {
+      background-color: $uni-color-primary;
+      color: #fff;
+      border-radius: 15rpx;
+    }
+  }
+}
 
 
 

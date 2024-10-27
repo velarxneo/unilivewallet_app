@@ -20,18 +20,20 @@
       </view>
     </view>
     
-    <view class="otc-trade-form">
+    <view class="section">
       <view class="otc-available-balance">
         <text>余额: {{ availableBalance }} {{ selectedOrderType === 'BUY' ? 'USDT' : 'SEE' }}</text>
       </view>
-      <view class="otc-input-group">
+      <view class="input-group">
         <text>价格</text>
         <input type="number" v-model="price" placeholder="USDT" />
       </view>
-      <view class="otc-input-group">
+      <view class="input-group">
         <text>数量</text>
-        <input type="number" v-model="amount" placeholder="SEE" @blur="onAmountInput" />
-        <button class="btn-max" @click="setMaxAmount">最大</button>
+        <view class="input-wrapper">
+          <input type="number" v-model="amount" placeholder="SEE" @blur="onAmountInput" />
+          <button class="btn-max" @click="setMaxAmount">最大</button>
+        </view>
       </view>
       <view class="otc-slider-group">
         <slider 
@@ -348,7 +350,7 @@ export default {
       uni.navigateTo({
         url: '/pages/OTCTrading/OTCHistory'
       });
-    },
+    }, 
     setBestPrice() {
       if (this.selectedOrderType === 'BUY') {
         // For buying SEE, use the lowest ask price

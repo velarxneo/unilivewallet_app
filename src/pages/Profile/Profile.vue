@@ -1,10 +1,10 @@
 <template>
   <view class="uni-container">
     <view class="header">
+      <button @click="goBack" class="back-button">
+
+      </button>
       <text class="uni-title">我的</text>
-      <view class="settings-icon">
-        <uni-icons type="gear" size="24" color="#fff"></uni-icons>
-      </view>
     </view>
     
     <view class="user-info">
@@ -102,7 +102,12 @@ export default {
     },
     async fetchUserData() {
       try {
-        const userId = 'user1'; // Replace this with actual user ID retrieval logic
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('User ID not found in localStorage');
+          // Handle the case when user is not logged in
+          return;
+        }
         const userData = await fetchUserBalancesWithDetails(userId);
         this.userId = userData.userId;
         this.address = userData.address;
@@ -123,7 +128,19 @@ export default {
       switch (action) {
         case 'transfer':
           console.log('Transfer action clicked');
-          // Implement transfer logic or navigation
+          uni.navigateTo({
+            url: '/pages/Wallet/Transfer',
+            success: function() {
+              console.log('Navigation to Transfer page successful');
+            },
+            fail: function(error) {
+              console.error('Navigation to Transfer page failed:', error);
+              uni.showToast({
+                title: 'Failed to open Transfer page',
+                icon: 'none'
+              });
+            }
+          });
           break;
         case 'receive':
           console.log('Receive action clicked');
@@ -142,3 +159,4 @@ export default {
   }
 };
 </script>
+
