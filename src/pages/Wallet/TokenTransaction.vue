@@ -1,28 +1,57 @@
 <template>
   <view class="uni-container">
     <view class="header">
-      <button @click="goBack" class="back-button">
-        <uni-icons type="back" size="24"></uni-icons>
-      </button>
+      <button class="back-button" @click="goBack"><uni-icons type="back" size="25"></uni-icons></button>
       <text class="uni-title">{{ tokenSymbol }}</text>
     </view>
+
     
-    <view class="token-balance">
-      <text class="balance-amount">{{ tokenBalance }}</text>
+    <view class="wallet-card">
+      <view class="wallet-header">
+        <text class="wallet-title">{{ tokenSymbol }}</text>
+        <text class="wallet-network">网络: BSC/BEP20</text>
+      </view>
+      <text class="wallet-balance">{{ tokenBalance }}</text>
     </view>
     
-    <view class="transaction-list">
-      <view v-for="(transaction, index) in transactions" :key="index" class="transaction-item">
-        <view class="transaction-icon">
-          <uni-icons :type="getTransactionIcon(transaction)" size="24" :color="getTransactionColor(transaction)"></uni-icons>
+    <view v-for="(transaction, index) in transactions" :key="index">
+      <!-- Received transaction -->
+      <view v-if="transaction.receiverUserId === userId" class="section-column" @click="showTransactionDetails(transaction)">
+        <view class="transaction-icon receive">
+          <uni-icons type="arrow-down" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-type">{{ getTransactionType(transaction) }}</text>
-          <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
+          <text class="transaction-address">From: {{ transaction.senderAddress.slice(0, 6) }}...{{ transaction.senderAddress.slice(-4) }}</text>
+          <view class="transaction-date-container">
+            <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
+          </view>
         </view>
-        <text class="transaction-amount" :class="getAmountClass(transaction)">
-          {{ getAmountPrefix(transaction) }}{{ transaction.amount.toFixed(4).padEnd(4, '0') }}
-        </text>
+        <view class="transaction-amount-container">
+          <text class="transaction-amount amount-positive">
+            +{{ parseFloat(transaction.amount).toFixed(4) }} {{ tokenSymbol }}
+          </text>
+        </view>
+      </view>
+      
+      <!-- Sent transaction -->
+      <view v-if="transaction.senderUserId === userId" class="section-column" @click="showTransactionDetails(transaction)">
+        <view class="transaction-icon send">
+          <uni-icons type="arrow-up" size="20" color="#fff"></uni-icons>
+        </view>
+        <view class="transaction-details">
+          <text class="transaction-address">To: {{ transaction.receiverAddress.slice(0, 6) }}...{{ transaction.receiverAddress.slice(-4) }}</text>
+          <view class="transaction-date-container">
+            <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
+          </view>
+        </view>
+        <view class="transaction-amount-container">
+          <text class="transaction-amount amount-negative">
+            -{{ (parseFloat(transaction.amount) + parseFloat(transaction.feeQty)).toFixed(4) }} {{ tokenSymbol }}
+          </text>
+          <text class="transaction-fee">
+            Fee: {{ transaction.feeQty }} {{ tokenSymbol }}
+          </text>
+        </view>
       </view>
     </view>
     
@@ -41,7 +70,7 @@
 </template>
 
 <script>
-import { fetchTokenTransactions } from '@/services/userService';
+import { fetchTokenSendTransactions } from '@/services/userService';
 
 export default {
   data() {
@@ -58,9 +87,9 @@ export default {
     };
   },
   onLoad(option) {
-    this.userId = option.userId;
     this.tokenSymbol = option.tokenSymbol;
     this.tokenBalance = option.tokenBalance;
+    this.userId = localStorage.getItem('userId');
     this.fetchTransactions();
   },
   onReachBottom() {
@@ -74,7 +103,11 @@ export default {
       
       this.loading = true;
       try {
-        const response = await fetchTokenTransactions(this.userId, this.tokenSymbol, this.page, this.size);
+        if (!this.userId) {
+          console.error('User ID not found in localStorage');
+          return;
+        }
+        const response = await fetchTokenSendTransactions(this.userId, this.tokenSymbol, this.page, this.size);
         if (response.content.length === 0) {
           this.noMoreData = true;
         } else {
@@ -95,70 +128,27 @@ export default {
     },
     formatDate(timestamp) {
       const date = new Date(timestamp);
-      return date.toLocaleString();
-    },
-    getTransactionIcon(transaction) {
-      switch (transaction.transactionCode.code) {
-        case 'DEP':
-          return 'arrow-down';
-        case 'WDR':
-          return 'arrow-up';
-        case 'BAL_TRF':
-          return 'loop';
-        default:
-          return 'info';
-      }
-    },
-    getTransactionColor(transaction) {
-      switch (transaction.transactionCode.code) {
-        case 'DEP':
-          return '#4CD964';
-        case 'WDR':
-          return '#FF3B30';
-        case 'BAL_TRF':
-          return '#007AFF';
-        default:
-          return '#999999';
-      }
-    },
-    getTransactionType(transaction) {
-      switch (transaction.transactionCode.code) {
-        case 'DEP':
-          return '存入';
-        case 'WDR':
-          return '转出';
-        case 'BAL_TRF':
-          return '余额转移';
-        default:
-          return transaction.transactionCode.transactionType;
-      }
-    },
-    getAmountClass(transaction) {
-      switch (transaction.transactionCode.code) {
-        case 'DEP':
-          return 'amount-positive';
-        case 'WDR':
-          return 'amount-negative';
-        default:
-          return '';
-      }
-    },
-    getAmountPrefix(transaction) {
-      switch (transaction.transactionCode.code) {
-        case 'DEP':
-          return '+';
-        case 'WDR':
-          return '-';
-        default:
-          return '';
-      }
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     },
     goBack() {
-      uni.navigateBack();
+      uni.reLaunch({
+        url: '/pages/Profile/Profile',
+        success: function() {
+          console.log('Successfully relaunched Profile page');
+        },
+        fail: function(err) {
+          console.error('Failed to relaunch Profile page:', err);
+        }
+      });
     },
     handleTransfer() {
       uni.navigateTo({
-        url: `/pages/Wallet/Transfer?tokenSymbol=${this.tokenSymbol}`
+        url: `/pages/Wallet/Send?tokenSymbol=${this.tokenSymbol}`
+      });
+    },
+    showTransactionDetails(transaction) {
+      uni.navigateTo({
+        url: `/pages/Wallet/TransactionDetails?transactionDetails=${encodeURIComponent(JSON.stringify(transaction))}&tokenSymbol=${this.tokenSymbol}`
       });
     }
   }
@@ -166,106 +156,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.uni-container {
-  padding: 20px;
-}
+// ... (keep the existing styles)
 
-.header {
+.section-column {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-}
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer; // Add this to indicate the item is clickable
 
-.back-button {
-  background: none;
-  border: none;
-  padding: 0;
-  margin-right: 10px;
-}
+  .transaction-icon {
+    margin-right: 15px;
+  }
 
-.uni-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.token-balance {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.balance-amount {
-  font-size: 36px;
-  font-weight: bold;
-}
-
-.transaction-list {
-  margin-bottom: 20px;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid $uni-border-color;
-
-  &:last-child {
-    border-bottom: none;
+  .transaction-details {
+    flex-grow: 1;
   }
 }
 
-.transaction-icon {
-  margin-right: 15px;
-}
-
-.transaction-details {
-  flex: 1;
-}
-
-.transaction-type {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.transaction-date {
-  font-size: 12px;
-  color: $uni-text-color-grey;
-}
-
-.transaction-amount {
-  font-size: 16px;
-  font-weight: bold;
-
-  &.amount-positive {
-    color: #4CD964;
-  }
-
-  &.amount-negative {
-    color: #FF3B30;
-  }
-}
-
-.footer {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-}
-
-.uni-btn {
-  width: 100%;
-  height: 44px;
-  line-height: 44px;
-  background-color: $uni-color-primary;
-  color: #fff;
-  border: none;
-  border-radius: 22px;
-  font-size: 16px;
-}
-
-.loading-indicator,
-.end-of-list {
-  text-align: center;
-  padding: 10px;
-  color: $uni-text-color-grey;
-}
+// ... (keep the rest of the existing styles)
 </style>

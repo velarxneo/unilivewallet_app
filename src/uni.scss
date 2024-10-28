@@ -81,7 +81,7 @@ $uni-font-size-paragraph: 15px;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
   min-height: 100vh;
   background: linear-gradient(to bottom, #f85634 0%, #f85634 10%, $uni-bg-color 30%);
   background-attachment: fixed;
@@ -376,8 +376,69 @@ page {
   margin-bottom: 20px;
 }
 
+.section-column {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+
+  .transaction-icon {
+    margin-right: 15px;
+  }
+
+  .transaction-details {
+    flex-grow: 1;
+  }
+}
+
 .section-header {
   margin-bottom: 15px;
+}
+
+.transaction-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+
+  &.send {
+    background-color: #ff3b30;
+  }
+
+  &.receive {
+    background-color: #4cd964;
+  }
+}
+
+
+
+.transaction-amount-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.transaction-amount {
+  font-size: 16px;
+  font-weight: bold;
+
+  &.amount-positive {
+    color: #4cd964;
+  }
+
+  &.amount-negative {
+    color: #ff3b30;
+  }
+}
+
+.transaction-fee {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
 }
 
 .input-group {
@@ -676,6 +737,12 @@ page {
 
 .footer {
   padding: 20px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $uni-bg-color; // Use the appropriate background color
+  z-index: 100; // Ensure it's above other content
 }
 
 // Update the existing button styles
@@ -1176,6 +1243,7 @@ page {
 .wallet-address {
   font-size: $font-size-xs;
   color: rgba(255, 255, 255, 0.7);
+  margin-left: 10px;
 }
 
 .quick-actions {
@@ -1208,6 +1276,46 @@ page {
   text {
     color: $text-color;
     font-size: $font-size-xs;
+  }
+}
+
+
+.qr-code {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.instructions {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.instruction-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.instruction-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: 5px;
+  color: #FF6B35;
+}
+
+.instruction-item {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+  padding-left: 25px;
+  position: relative;
+
+  &::before {
+    content: '•';
+    position: absolute;
+    left: 10px;
   }
 }
 
@@ -1278,7 +1386,7 @@ page {
   color: $text-color;
 }
 
-.transfer-type-header {
+.send-type-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1286,7 +1394,7 @@ page {
   width: 100%;
 }
 
-.transfer-type-selector {
+.send-type-selector {
   display: flex;
   background-color: $uni-bg-color;
   border-radius: 15rpx;

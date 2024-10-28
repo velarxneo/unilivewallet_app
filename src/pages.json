@@ -47,7 +47,7 @@
 			}
 		},
 		{
-			"path": "pages/Wallet/Transfer",
+			"path": "pages/Wallet/Send",
 			"style": {
 				"navigationBarTitleText": "转账",
 				"navigationStyle": "custom"
@@ -57,6 +57,27 @@
 			"path": "pages/Wallet/TokenTransaction",
 			"style": {
 				"navigationBarTitleText": "代币交易",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Wallet/TransactionDetails",
+			"style": {
+				"navigationBarTitleText": "Transaction Details",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Wallet/Receive",
+			"style": {
+				"navigationBarTitleText": "收款",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Wallet/Convert",
+			"style": {
+				"navigationBarTitleText": "兑换",
 				"navigationStyle": "custom"
 			}
 		}

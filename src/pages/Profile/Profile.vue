@@ -23,12 +23,12 @@
         <text class="wallet-title">钱包总资产 (USDT)</text>
         <text class="wallet-network">网络: BSC/BEP20</text>
       </view>
-      <text class="wallet-balance">{{ usdtWalletBalance }}</text>
+      <text class="wallet-balance">{{ parseFloat(usdtWalletBalance).toFixed(4) }}</text>
       <text class="wallet-address">钱包地址: {{ truncatedAddress }}</text>
     </view>
     
     <view class="quick-actions">
-      <view class="action-item" @click="handleAction('transfer')">
+      <view class="action-item" @click="handleAction('send')">
         <uni-icons type="redo-filled" size="24" color="#333"></uni-icons>
         <text>转账</text>
       </view>
@@ -40,9 +40,9 @@
         <uni-icons type="loop" size="24" color="#333"></uni-icons>
         <text>划转</text>
       </view>
-      <view class="action-item" @click="handleAction('refresh')">
-        <uni-icons type="refresh" size="24" color="#333"></uni-icons>
-        <text>闪兑</text>
+      <view class="action-item" @click="navigateToConvert">
+        <uni-icons type="refresh" size="30"></uni-icons>
+        <text>兑换</text>
       </view>
     </view>
     
@@ -53,23 +53,23 @@
         <view class="asset-details">
           <view class="asset-row">
             <text class="asset-label">冻结</text>
-            <text class="asset-value">{{ balance.lockedWalletBalance }}</text>
+            <text class="asset-value">{{ parseFloat(balance.lockedWalletBalance).toFixed(4) }}</text>
           </view>
           <view class="asset-row">
             <text class="asset-label">可用</text>
-            <text class="asset-value">{{ balance.walletBalance - balance.lockedWalletBalance }}</text>
+            <text class="asset-value">{{ (parseFloat(balance.walletBalance) - parseFloat(balance.lockedWalletBalance)).toFixed(4) }}</text>
           </view>
         </view>
         <uni-icons type="right" size="16" color="#999"></uni-icons>
       </view>
     </view>
     
-    <view class="action-list">
+    <!-- <view class="action-list">
       <view class="action-item" @click="navigateTo('/pages/OTCTrading/OTCHistory')">
         <text class="action-text">问题工单</text>
         <uni-icons type="right" size="16" color="#999"></uni-icons>
       </view>
-    </view>
+    </view> -->
     
     <BottomMenu />
   </view>
@@ -126,17 +126,17 @@ export default {
     },
     handleAction(action) {
       switch (action) {
-        case 'transfer':
-          console.log('Transfer action clicked');
+        case 'send':
+          console.log('Send action clicked');
           uni.navigateTo({
-            url: '/pages/Wallet/Transfer',
+            url: '/pages/Wallet/Send',
             success: function() {
-              console.log('Navigation to Transfer page successful');
+              console.log('Navigation to Send page successful');
             },
             fail: function(error) {
-              console.error('Navigation to Transfer page failed:', error);
+              console.error('Navigation to Send page failed:', error);
               uni.showToast({
-                title: 'Failed to open Transfer page',
+                title: 'Failed to open Send page',
                 icon: 'none'
               });
             }
@@ -144,21 +144,33 @@ export default {
           break;
         case 'receive':
           console.log('Receive action clicked');
-          // Implement receive logic or navigation
+          uni.navigateTo({
+            url: '/pages/Wallet/Receive',
+            success: function() {
+              console.log('Navigation to Receive page successful');
+            },
+            fail: function(error) {
+              console.error('Navigation to Receive page failed:', error);
+              uni.showToast({
+                title: 'Failed to open Receive page',
+                icon: 'none'
+              });
+            }
+          });
           break;
         case 'exchange':
           console.log('Exchange action clicked');
           // Implement exchange logic or navigation
           break;
-        case 'refresh':
-          console.log('Refresh action clicked');
-          // Implement refresh logic or navigation
+        case 'convert':
+          console.log('Convert action clicked');
+          // Implement convert logic or navigation
           break;
       }
     },
     showTokenDetails(balance) {
       uni.navigateTo({
-        url: `/pages/Wallet/TokenTransaction?userId=${this.userId}&tokenSymbol=${balance.tokenSymbol}&tokenBalance=${balance.walletBalance}`,
+        url: `/pages/Wallet/TokenTransaction?tokenSymbol=${balance.tokenSymbol}&tokenBalance=${balance.walletBalance}`,
         success: function() {
           console.log('Navigation to TokenTransaction page successful');
         },
@@ -169,6 +181,11 @@ export default {
             icon: 'none'
           });
         }
+      });
+    },
+    navigateToConvert() {
+      uni.navigateTo({
+        url: '/pages/Wallet/Convert'
       });
     }
   }

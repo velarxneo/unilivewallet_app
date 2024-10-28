@@ -5,17 +5,17 @@
       <text class="uni-title">转账</text>
     </view>
     
-    <view class="transfer-type-header">
-      <view class="transfer-type-selector">
-        <text :class="{ active: transferType === 'address' }" @click="transferType = 'address'">钱包地址</text>
-        <text :class="{ active: transferType === 'userId' }" @click="transferType = 'userId'">用户PID</text>
+    <view class="send-type-header">
+      <view class="send-type-selector">
+        <text :class="{ active: sendType === 'address' }" @click="sendType = 'address'">钱包地址</text>
+        <text :class="{ active: sendType === 'userId' }" @click="sendType = 'userId'">用户PID</text>
       </view>
     </view>
     <view class="section">
       <view class="input-group">
-        <text class="input-label">{{ transferType === 'address' ? '接收地址' : '接收用户ID' }}</text>
+        <text class="input-label">{{ sendType === 'address' ? '接收地址' : '接收用户ID' }}</text>
         <input type="text" v-model="recipient"
-          :placeholder="transferType === 'address' ? '请输入或长按粘贴转账地址' : '请输入接收用户ID'" />
+          :placeholder="sendType === 'address' ? '请输入或长按粘贴转账地址' : '请输入接收用户ID'" />
       </view>
 
       <view class="input-group">
@@ -37,9 +37,10 @@
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-header">
-        <text class="title">转账说明</text>
+    <view class="instructions">
+      <view class="instruction-header">
+        <uni-icons type="info" size="20" color="#FF6B35"></uni-icons>
+        <text class="instruction-title">转账说明</text>
       </view>
       <view class="info">
         <text>转账地址与接收地址一致</text>
@@ -61,7 +62,7 @@
         <view class="confirmation-title">转账信息</view>
         <view class="confirmation-details">
           <view class="detail-item-column">
-            <text>{{ transferType === 'address' ? '钱包地址' : '用户ID' }}</text>
+            <text>{{ sendType === 'address' ? '钱包地址' : '用户ID' }}</text>
             <text class="full-text">{{ recipient }}</text>
           </view>
           <view class="detail-item-column">
@@ -93,7 +94,7 @@
 </template>
 
 <script>
-import { fetchUserBalancesWithDetails, transferToAddress, transferToUserId } from '@/services/userService';
+import { fetchUserBalancesWithDetails, sendToAddress, sendToUserId } from '@/services/userService';
 import ResultPopup from '@/components/ResultPopup.vue';
 
 export default {
@@ -102,7 +103,7 @@ export default {
   },
   data() {
     return {
-      transferType: 'address',
+      sendType: 'address',
       recipient: '',
       amount: '',
       selectedToken: '',
@@ -170,10 +171,10 @@ export default {
       this.showConfirmationPopup = false;
       try {
         let result;
-        if (this.transferType === 'address') {
-          result = await this.transferToAddress();
+        if (this.sendType === 'address') {
+          result = await this.sendToAddress();
         } else {
-          result = await this.transferToUserId();
+          result = await this.sendToUserId();
         }
         
         if (result && result.success) {
@@ -185,16 +186,16 @@ export default {
         this.showTransferResult(false, error.message);
       }
     },
-    async transferToAddress() {
-      return await transferToAddress(
+    async sendToAddress() {
+      return await sendToAddress(
         this.userId,
         this.recipient,
         this.selectedToken,
         parseFloat(this.amount)
       );
     },
-    async transferToUserId() {
-      return await transferToUserId(
+    async sendToUserId() {
+      return await sendToUserId(
         this.userId,
         this.recipient,
         this.selectedToken,
