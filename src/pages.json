@@ -63,7 +63,7 @@
 		{
 			"path": "pages/Wallet/TransactionDetails",
 			"style": {
-				"navigationBarTitleText": "Transaction Details",
+				"navigationBarTitleText": "交易详情",
 				"navigationStyle": "custom"
 			}
 		},
@@ -78,6 +78,13 @@
 			"path": "pages/Wallet/Convert",
 			"style": {
 				"navigationBarTitleText": "兑换",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Wallet/Transfer",
+			"style": {
+				"navigationBarTitleText": "划转",
 				"navigationStyle": "custom"
 			}
 		}

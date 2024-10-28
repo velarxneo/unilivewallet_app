@@ -185,3 +185,70 @@ export async function fetchConversionHistory(userId, page, size) {
     throw error;
   }
 }
+
+// Add this function to userService.js
+
+export async function transferBalance(userId, tokenSymbol, amount, toOTC) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet/balances/transfer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        tokenSymbol,
+        qty: amount,
+        toOTC
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '划转失败');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error transferring balance:', error);
+    throw error;
+  }
+}
+
+// Add this new function
+export async function fetchTransferFee(token, qty) {
+  try {
+    //console.log(`Fetching fee for token: ${token}, qty: ${qty}`);
+    const response = await fetch(`${API_BASE_URL}/api/get-fee?token=${token}&qty=${qty}&code=BAL_TRF`);
+    //console.log('Fee API response:', response.status);
+    if (!response.ok) {
+      throw new Error('Failed to fetch fee');
+    }
+    const data = await response.json();
+    return {
+      feeConfiguration: data.feeConfiguration, // Fee configuration (e.g., "5%-8%")
+      totalFee: data.totalFee // Actual fee amount
+    };
+  } catch (error) {
+    console.error('Error fetching fee:', error);
+    throw error;
+  }
+}
+
+// Add this new function to fetch transfer history
+export async function fetchTransferHistory(userId, page, size) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/wallet/transactions/user?userId=${userId}&transactionCode=BAL_TRF&page=${page}&size=${size}&sort=timestamp,desc`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch transfer history');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transfer history:', error);
+    throw error;
+  }
+}

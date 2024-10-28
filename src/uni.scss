@@ -75,6 +75,7 @@ $uni-font-size-subtitle: 18px;
 $uni-color-paragraph: #3f536e; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
 
+
 // Add these if they don't already exist in your uni.scss file
 
 .uni-container {
@@ -635,6 +636,18 @@ page {
   z-index: 1000;
 }
 
+.popup-content {
+  background-color: $uni-bg-color;
+  padding: $uni-spacing-row-lg;
+  border-radius: $uni-border-radius-lg;
+  width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column; // Set column layout
+  align-items: center; // Center items horizontally
+  justify-content: center; // Center items vertically
+}
+
 .login-popup-content {
   background-color: $uni-bg-color;
   padding: $uni-spacing-row-lg;
@@ -944,6 +957,7 @@ page {
 }
 
 .confirmation-title {
+  width: 100%;
   font-size: 18px;
   font-weight: bold;
   text-align: center;
@@ -951,12 +965,14 @@ page {
 }
 
 .confirmation-subtitle {
+  width: 100%;
   font-size: 14px;
   text-align: center;
   margin-bottom: 20px;
 }
 
 .confirmation-details {
+  width: 100%;
   margin-bottom: 20px;
 }
 
@@ -986,6 +1002,7 @@ page {
 .confirmation-buttons {
   display: flex;
   justify-content: space-between;
+  width: 100%;
 }
 
 .btn-cancel, .btn-confirm {
@@ -1004,6 +1021,66 @@ page {
 .btn-confirm {
   background-color: $uni-color-primary;
   color: #fff;
+}
+
+
+.token-picker {
+  min-width: 100px;
+  height: 40px;
+  border: 1px solid $uni-border-color;
+  border-radius: $uni-border-radius-base;
+  background-color: $uni-bg-color;
+}
+
+.picker {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  input {
+    flex: 1;
+  }
+}
+
+.notice-text {
+  color: $uni-color-primary;
+  font-weight: bold;
+}
+
+.notice-content {
+  color: $uni-text-color-grey;
+  margin-bottom: 20px;
+}
+
+.record-date {
+  color: $uni-text-color-grey;
+  font-size: $uni-font-size-sm;
+}
+
+.record-feeQty {
+  text-align: right;
+  color: $uni-text-color-grey;
+  font-size: $uni-font-size-sm;
+}
+
+.record-amount {
+  text-align: right;
+  width: 100%;
+  &.amount-positive {
+    color: $uni-color-success;
+  }
+
+  &.amount-negative {
+    color: $uni-color-error;
+  }
 }
 
 .result-popup {
@@ -1031,12 +1108,16 @@ page {
 }
 .result-icon {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .result-title {
   font-size: 18px;
+  text-align: center;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .result-message {

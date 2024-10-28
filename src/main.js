@@ -2,9 +2,13 @@ import Vue from 'vue'
 import App from './App'
 import BottomMenu from './components/BottomMenu.vue'
 import LoginPopup from './components/LoginPopup.vue'
-import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'; // Adjust the path as needed
+import UniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue'
+import UniTransition from '@dcloudio/uni-ui/lib/uni-transition/uni-transition.vue'
+import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue'; // Adjust the path as needed
 
-Vue.component('uni-icons', uniIcons);
+Vue.component('uni-popup', UniPopup);
+Vue.component('uni-transition', UniTransition);
+Vue.component('uni-icons', UniIcons);
 import '@/uni.scss'
 
 Vue.config.productionTip = false

@@ -36,11 +36,11 @@
         <uni-icons type="download-filled" size="24" color="#333"></uni-icons>
         <text>收款</text>
       </view>
-      <view class="action-item" @click="handleAction('exchange')">
+      <view class="action-item" @click="handleAction('transfer')">
         <uni-icons type="loop" size="24" color="#333"></uni-icons>
         <text>划转</text>
       </view>
-      <view class="action-item" @click="navigateToConvert">
+      <view class="action-item" @click="handleAction('convert')">
         <uni-icons type="refresh" size="30"></uni-icons>
         <text>兑换</text>
       </view>
@@ -158,13 +158,35 @@ export default {
             }
           });
           break;
-        case 'exchange':
-          console.log('Exchange action clicked');
-          // Implement exchange logic or navigation
+        case 'transfer':
+        uni.navigateTo({
+            url: '/pages/Wallet/Transfer',
+            success: function() {
+              console.log('Navigation to Transfer page successful');
+            },
+            fail: function(error) {
+              console.error('Navigation to Transfer page failed:', error);
+              uni.showToast({
+                title: 'Failed to open Transfer page',
+                icon: 'none'
+              });
+            }
+          });
           break;
         case 'convert':
-          console.log('Convert action clicked');
-          // Implement convert logic or navigation
+          uni.navigateTo({
+            url: '/pages/Wallet/Convert',
+            success: function() {
+              console.log('Navigation to Convert page successful');
+            },
+            fail: function(error) {
+              console.error('Navigation to Convert page failed:', error);
+              uni.showToast({
+                title: 'Failed to open Convert page',
+                icon: 'none'
+              });
+            }
+          });
           break;
       }
     },
