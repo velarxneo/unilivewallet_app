@@ -8,15 +8,15 @@
       <text :class="{ active: selectedTab === 'BUY' }" @click="selectTab('BUY')">买</text>
       <text :class="{ active: selectedTab === 'SELL' }" @click="selectTab('SELL')">卖出</text>
     </view>
-    <br />
+    
     <view class="otc-order-selector">
       <text :class="{ active: selectedStatus === 'OPEN' }" @click="selectStatus('OPEN')">进行中</text>
       <text :class="{ active: selectedStatus === 'FILLED' }" @click="selectStatus('FILLED')">已完成</text>
       <text :class="{ active: selectedStatus === 'CANCELLED' }" @click="selectStatus('CANCELLED')">已取消</text>
     </view>
-    <view class="order-list" @scroll="handleScroll">
-      <view v-for="(order, index) in filteredOrders" :key="index" class="order-item">
-        <view class="order-header">
+    <view class="section" @scroll="handleScroll">
+      <view v-for="(order, index) in filteredOrders" :key="index" class="history-item">
+        <view class="history-item-main">
           <text>{{ order.orderType === 'BUY' ? '买入' : '卖出' }}</text>
           <text>SEE: {{ order.qty ? order.qty.toFixed(4).padEnd(4, '0') : '0.0000' }}</text>
         </view>

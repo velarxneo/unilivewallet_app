@@ -156,20 +156,14 @@ $uni-font-size-paragraph: 15px;
 
 .order-item {
   background-color: #fff;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  height: 10px;
 }
 
 .order-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.order-details {
-  margin-bottom: 8px;
+  //margin-bottom: 8px;
 }
 
 .uni-card {
@@ -344,6 +338,7 @@ $secondary-color: #FF3B30;
 $background-color: #FF6B35; // Update this to match the orange background in the image
 $text-color: #333333;
 $light-text-color: #999999;
+$table-header-color: #fff3df;
 
 /* Font sizes */
 $body-font-size: 16px; // Base font size
@@ -483,7 +478,6 @@ page {
 }
 
 .btn-max {
- 
   background-color: $uni-color-primary;
   color: #fff;
   border: none;
@@ -537,6 +531,7 @@ page {
   overflow: hidden;
   font-weight: bold;
   padding: 5rpx;
+  margin-bottom: 10px;
   text {
     flex: 1;
     text-align: center;
@@ -548,6 +543,7 @@ page {
       border-radius: 15rpx;
     }
   }
+
 }
 
 .otc-trade-form {
@@ -620,6 +616,29 @@ page {
       }
     }
   }
+}
+
+.order-select-content {
+  background-color: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative; // Add this
+}
+
+.order-select-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.order-select-title {
+  font-size: 18px;
+  font-weight: bold;
 }
 
 // Login Popup Styles
@@ -867,21 +886,34 @@ page {
   .otc-order-book {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    padding: 1.25rem;
+    padding: 0.25rem;
     margin-top: 1.25rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
     .otc-order-book-header {
-      display: flex;
-      background-color: #f5f5f5;
-      border-radius: 4px 4px 0 0;
-      
+      display: flex;     
       .buy-header, .sell-header {
         flex: 1;
         text-align: center;
         padding: 0.5rem;
         font-weight: bold;
         color: #333;
+        margin: 5px;
+        background-color: $table-header-color;
+        border-radius: $border-radius-base; // Added border radius
+      }
+    }
+
+    .otc-order-book-footer {
+      display: flex;     
+      .buy-footer, .sell-footer {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        font-weight: bold;
+        color: $uni-color-primary;
+        margin: 5px;
+        background-color: $table-header-color;
       }
     }
 
@@ -896,8 +928,8 @@ page {
         display: flex;
         justify-content: space-between;
         padding: 0.5rem;
-        background-color: #f9f9f9;
-        font-weight: bold;
+        background-color: #ffffff;
+        font-weight: normal;
         font-size: 0.9em;
         color: #333;
       }
@@ -905,7 +937,7 @@ page {
       .order-item {
         display: flex;
         justify-content: space-between;
-        padding: 0.5rem;
+        padding: 0.6rem;
         font-size: 0.9em;
       }
     }
@@ -928,7 +960,7 @@ page {
       text-align: center;
       font-weight: bold;
       padding: 0.5rem;
-      background-color: #f5f5f5;
+      background-color: $table-header-color;
       border-top: 1px solid #e0e0e0;
       color: #ff3b30;
     }
@@ -1140,9 +1172,34 @@ page {
   margin-top: 20px;
 }
 
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
 .history-title {
+  color: $uni-color-primary;
   font-weight: bold;
-  margin-bottom: 10px;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid $uni-border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.history-item-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .transaction-item {
@@ -1324,7 +1381,7 @@ page {
 .wallet-address {
   font-size: $font-size-xs;
   color: rgba(255, 255, 255, 0.7);
-  margin-left: 10px;
+ 
 }
 
 .quick-actions {
@@ -1496,5 +1553,146 @@ page {
   }
 }
 
+.order-select-content {
+  background-color: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
 
+.order-select-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.order-select-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.order-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid $uni-border-color;
+   
+  }
+  
+  .order-header-left,
+  .order-header-right {
+    flex: 1;
+  }
+  
+  .header-label {
+    font-size: 14px;
+    color: $uni-text-color-grey;
+    font-weight: bold;
+  }
+  
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $uni-border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.order-item-left,
+.order-item-right {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.order-qty,
+.order-price {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.order-label {
+  font-size: 12px;
+  color: $uni-text-color-grey;
+}
+
+.order-select-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.order-select-submit {
+  width: 100%;
+  height: 44px;
+  background-color: $uni-color-primary;
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  font-size: 16px;
+}
+
+
+.copy-button {
+  background: none;
+  border: none;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.refresh-button {
+  background: none;
+  border: none;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 

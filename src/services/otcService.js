@@ -44,13 +44,13 @@ export async function fetchTransactionHistory(userId) {
 export async function matchOrder(requestBody) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/otc/match`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
         });
-
+        
         if (!response.ok) {
         throw new Error('Failed to match order');
         }
@@ -99,6 +99,53 @@ export async function cancelOrder(orderId) {
     return await response.json();
   } catch (error) {
     console.error('Error canceling order:', error);
+    throw error;
+  }
+}
+
+export async function fetchRawOrderBook(baseTokenSymbol, quoteTokenSymbol) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/otc/raw-orderbook?baseTokenSymbol=${baseTokenSymbol}&quoteTokenSymbol=${quoteTokenSymbol}`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch raw order book');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching raw order book:', error);
+    throw error;
+  }
+}
+
+export async function fillSelectedOrders(orderData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/otc/fill-selected`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fill selected orders');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error filling selected orders:', error);
+    throw error;
+  }
+}
+
+export async function fetchTransactionFee(token, qty) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/get-fee?token=${token}&qty=${qty}&code=TRADE`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch transaction fee');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transaction fee:', error);
     throw error;
   }
 }

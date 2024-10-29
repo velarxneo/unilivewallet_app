@@ -98,13 +98,14 @@ export async function sendToUserId(senderUserId, recipientUserId, tokenSymbol, q
 
 export async function fetchTokenSendTransactions(userId, tokenSymbol, page, size) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/wallet/transactions/user?userId=${userId}&tokenSymbol=${tokenSymbol}&transactionCode=SEND&page=${page}&size=${size}&sort=timestamp,desc`);
+    const response = await fetch(`${API_BASE_URL}/api/wallet/transactions/user?userId=${userId}&tokenSymbol=${tokenSymbol}&page=${page}&size=${size}&sort=timestamp,desc`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch token transactions');
     }
     
     const data = await response.json();
+    console.log(data); // Log the fetched data for debugging
     
     // The API now returns both SND_UID and SND_ADR transactions
     // We don't need to modify the data here, just return it as is
@@ -249,6 +250,36 @@ export async function fetchTransferHistory(userId, page, size) {
     return await response.json();
   } catch (error) {
     console.error('Error fetching transfer history:', error);
+    throw error;
+  }
+}
+
+// Add this new function to userService.js
+export async function checkWalletDeposits(userId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet-deposits/check?userId=${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    // First check the content type of the response
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      // If it's not JSON, get the text response
+      const text = await response.text();
+      return { message: text }; // Wrap the text in an object
+    }
+    
+  } catch (error) {
+    console.error('Error checking wallet deposits:', error);
     throw error;
   }
 }

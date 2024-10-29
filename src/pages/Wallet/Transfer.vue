@@ -7,17 +7,7 @@
       <text class="uni-title">划转</text>
     </view>
 
-    <view class="balance-info">
-      <text>钱包</text>
-      <text>OTC</text>
-      <text>{{ walletBalance }}</text>
-      <text>{{ otcBalance }}</text>
-      <text class="available-text">可划{{ selectedToken }}</text>
-      <text class="all-button" @click="setMaxAmount">全部</text>
-      <text>{{ maxAmount }}</text>
-    </view>
-
-    <view class="transfer-form">
+    <view class="section">
       <view class="input-group">
         <text>数量</text>
         <view class="input-wrapper">
@@ -33,6 +23,15 @@
             </view>
           </picker>
         </view>
+        
+      </view>
+      <view class="balance">
+        <text>可划数量：{{ maxAmount }} {{ selectedToken }}</text>
+        <text class="all-button" @click="setMaxAmount">全部</text>
+      </view>
+      <view class="balance">
+        <text>OTC数量：{{ otcBalance }} {{ selectedToken }}</text>
+    
       </view>
     </view>
     <view class="section">
@@ -333,79 +332,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-// Using variables from uni.scss
-.balance-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.available-text {
-  color: $uni-text-color-grey;
-}
-
-.all-button {
-  color: $uni-color-primary;
-  text-align: right;
-}
-
-.transfer-form {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.transfer-notice {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 10px;
-}
-
-
-
-.transfer-history {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-.history-header {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 15px;
-}
-
-.history-title {
-  color: $uni-color-primary;
-  font-weight: bold;
-}
-
-.history-item {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0;
-  border-bottom: 1px solid $uni-border-color;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.history-item-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-
-</style>
 

@@ -13,7 +13,7 @@
     <view class="wallet-address">
       <text class="address">{{ userAddress }}</text>
       <button class="copy-button" @click="copyAddress">
-        <uni-icons type="copy" size="20" color="#007AFF"></uni-icons>
+        <image :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="copy-icon"></image>
       </button>
     </view>
 
@@ -45,12 +45,22 @@ export default {
   data() {
     return {
       tokenSymbol: '',
-      userAddress: '0xCBB53E7A12a7AF9D9E9C7C6C9D909E944b03C'
+      userAddress: '',
+      isCopied: false
     };
   },
   onLoad(option) {
-    this.tokenSymbol = option.tokenSymbol;
-    // Fetch user address here
+    if (option.address) {
+      this.userAddress = option.address;
+    } else {
+      uni.showToast({
+        title: '未获取到钱包地址',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        uni.navigateBack();
+      }, 1500);
+    }
   },
   methods: {
     goBack() {
@@ -60,60 +70,18 @@ export default {
       uni.setClipboardData({
         data: this.userAddress,
         success: () => {
+          this.isCopied = true;
           uni.showToast({
             title: '地址已复制',
             icon: 'success'
           });
+          
+          setTimeout(() => {
+            this.isCopied = false;
+          }, 3000);
         }
       });
     }
   }
 };
 </script>
-
-<style lang="scss" scoped>
-
-
-.network-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.network-label {
-  color: #999;
-}
-
-.network-value {
-  font-weight: bold;
-}
-
-.wallet-address {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.address {
-  font-size: 14px;
-  color: #333;
-  word-break: break-all;
-  flex: 1;
-  margin-right: 10px;
-}
-
-.copy-button {
-  background: none;
-  border: none;
-  padding: 5px;
-}
-
-</style>

@@ -68,7 +68,7 @@
             <text>数量(SEE)</text>
             <text>价格(USDT)</text>
           </view>
-          <view v-for="(order, index) in orderBook.bids.slice(0, 5)" :key="'buy-' + index" class="order-item buy">
+          <view v-for="(order, index) in orderBook.bids.slice(0, 10)" :key="'buy-' + index" class="order-item buy">
             <text>{{ parseFloat(order.quantity).toFixed(4).padEnd(4, '0') }}</text>
             <text>{{ parseFloat(order.price).toFixed(4).padEnd(4, '0') }}</text>
           </view>
@@ -78,11 +78,20 @@
             <text>价格(USDT)</text>
             <text>数量(SEE)</text>
           </view>
-          <view v-for="(order, index) in sortedAsks.slice(0, 5)" :key="'sell-' + index" class="order-item sell">
+          <view v-for="(order, index) in sortedAsks.slice(0, 10)" :key="'sell-' + index" class="order-item sell">
             <text>{{ parseFloat(order.price).toFixed(4).padEnd(4, '0') }}</text>
             <text>{{ parseFloat(order.quantity).toFixed(4).padEnd(4, '0') }}</text>
           </view>
         </view>
+      </view>
+      <view class="otc-order-book-footer">
+        <view class="sell-footer" @click="showCustomOrder('SELL')">
+          <text>自定义卖</text>
+        </view>
+        <view class="buy-footer" @click="showCustomOrder('BUY')">
+          <text>自定义买</text>
+        </view>
+        
       </view>
       <view class="otc-current-price">
         <text>{{ parseFloat(currentPrice).toFixed(4).padEnd(4, '0') }} USDT</text>
@@ -130,10 +139,10 @@
       </view>
     </view>
 
-    <!-- Confirmation Popup -->
-    <view v-if="showConfirmationPopup" class="confirmation-popup">
-      <view class="confirmation-content">
-        <text class="confirmation-title">{{ confirmationTitle }}</text>
+    <!-- Replace the custom confirmation popup with uni-popup -->
+    <uni-popup ref="confirmPopup" type="center">
+      <view class="popup-content">
+        <view class="confirmation-title">{{ confirmationTitle }}</view>
         <text class="confirmation-subtitle">您确认{{ orderType }}{{ amount }} {{ orderCurrency }}吗</text>
         <view class="confirmation-details">
           <view class="detail-item">
@@ -159,26 +168,69 @@
           <button class="btn-confirm" @click="confirmOrder">确定</button>
         </view>
       </view>
-    </view>
+    </uni-popup>
 
-    <!-- Use the new ResultPopup component -->
-    <ResultPopup 
-      :show="showResultPopup"
-      :success="transactionSuccess"
-      :message="resultMessage"
-      @close="closeResultPopup"
+    <!-- Replace the custom result popup with uni-popup -->
+    <uni-popup ref="resultPopup" type="center">
+      <view class="popup-content">
+        <view class="result-icon">
+          <uni-icons 
+            :type="transactionSuccess ? 'checkmarkempty' : 'closeempty'" 
+            size="50" 
+            :color="transactionSuccess ? '#4CD964' : '#FF3B30'"
+          />
+        </view>
+        <text class="result-title">{{ transactionSuccess ? '交易成功' : '交易失败' }}</text>
+        <text class="result-message">{{ resultMessage }}</text>
+        <button class="uni-btn" @click="closeResultPopup">确定</button>
+      </view>
+    </uni-popup>
+
+    <!-- Replace the order select popup with the new component -->
+    <OrderSelect
+      ref="orderSelect"
+      :orderType="customOrderType"
+      :rawOrders="rawOrders"
+      :targetQty="parseFloat(customQty)"
+      @submit="handleOrderSelection"
     />
+
+    <!-- Add quantity input popup -->
+    <uni-popup ref="qtyInputPopup" type="center">
+      <view class="popup-content">
+        <view class="confirmation-title">{{ customOrderType === 'BUY' ? '买入' : '卖出' }} SEE</view>
+        <text class="confirmation-subtitle">
+          <view class="input-group">
+          <text>数量</text>
+          <input 
+            type="number" 
+            v-model="customQty" 
+            :placeholder="`输入${customOrderType === 'BUY' ? '买入' : '卖出'}数量`"
+          />
+          </view>
+        </text>
+        <view class="confirmation-details">
+         
+        </view>
+        <view class="confirmation-buttons">
+          <button class="btn-cancel" @click="$refs.qtyInputPopup.close()">取消</button>
+          <button class="btn-confirm" @click="confirmQuantity">确定</button>
+        </view>
+      </view>
+    </uni-popup>
+
+    
   </view>
 </template>
 
 <script>
-import ResultPopup from '@/components/ResultPopup.vue';
-import { fetchOrderBook, fetchFeeConfiguration, fetchTransactionHistory, matchOrder } from '@/services/otcService';
+import { fetchOrderBook, fetchFeeConfiguration, fetchTransactionHistory, matchOrder, fetchRawOrderBook, fillSelectedOrders } from '@/services/otcService';
 import { fetchUserBalances } from '@/services/userService';
+import OrderSelect from './OrderSelect.vue';
 
 export default {
   components: {
-    ResultPopup
+    OrderSelect
   },
   data() {
     return {
@@ -201,6 +253,13 @@ export default {
       sliderValue: 0,
       transactionHistory: [], // Add this line
       orderType: 'BUY', // Add this line
+      customOrderType: 'BUY',
+      customPrice: '',
+      customAmount: '',
+      selectedOrders: [],
+      rawOrders: [],
+      selectedOrderIds: [],
+      customQty: '', // Add this for the initial quantity input
     };
   },
   computed: {
@@ -256,6 +315,11 @@ export default {
     feeCurrency() {
       return this.selectedOrderType === 'BUY' ? 'SEE' : 'USDT';
     },
+    filteredOrders() {
+      return this.customOrderType === 'BUY' 
+        ? this.orderBook.asks
+        : this.orderBook.bids;
+    }
   },
   methods: {
     async fetchOrderBook() {
@@ -290,53 +354,65 @@ export default {
       }
     },
     showConfirmation(type) {
-      this.orderType = type === 'BUY' ? '买入' : '卖出'; // Update this line
-      console.log(this.orderType);
-      console.log(this.fee);
-      console.log(this.actualAmount);
-      console.log(this.selectedOrderType);
-      this.showConfirmationPopup = true;
+      this.orderType = type === 'BUY' ? '买入' : '卖出';
+      this.$refs.confirmPopup.open();
     },
     cancelConfirmation() {
-      this.showConfirmationPopup = false;
-      this.transactionSuccess = false;
-      this.resultMessage = '您已取消交易';
-      this.showResultPopup = false;
+      this.$refs.confirmPopup.close();
     },
     async confirmOrder() {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        console.error('User ID not found');
-        return;
-      }
-
-      const oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-
-      const requestBody = {
-        userId: userId,
-        orderType: this.selectedOrderType,
-        baseTokenSymbol: 'SEE',
-        quoteTokenSymbol: 'USDT',
-        qty: parseFloat(this.amount),
-        price: parseFloat(this.price),
-        expirationDate: oneYearFromNow.toISOString()
-      };
-
+      this.$refs.confirmPopup.close();
       try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('User ID not found');
+          return;
+        }
+
+        const oneYearFromNow = new Date();
+        oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+        const requestBody = {
+          userId: userId,
+          orderType: this.selectedOrderType,
+          baseTokenSymbol: 'SEE',
+          quoteTokenSymbol: 'USDT',
+          qty: parseFloat(this.amount),
+          price: parseFloat(this.price),
+          expirationDate: oneYearFromNow.toISOString()
+        };
+
+
         const result = await matchOrder(requestBody);
-        this.transactionSuccess = true;
-        this.resultMessage = '您可以在我的订单中查看';
+
+        
+        // Check if the API call was successful
+        if (result) {
+          this.transactionSuccess = true;
+          this.resultMessage = '您可以在我的订单中查看';
+          // Refresh data only on success
+          await this.fetchOrderBook();
+          await this.fetchUserBalances();
+          await this.fetchTransactionHistory();
+          // Reset form
+          this.amount = '';
+          this.price = '';
+        } else {
+          // Handle API error response
+          this.transactionSuccess = false;
+          this.resultMessage = result?.message || '交易失败';
+        }
       } catch (error) {
+        // Handle network or other errors
+        console.error('Error in order matching:', error);
         this.transactionSuccess = false;
-        this.resultMessage = '交易过程中发生错误，请稍后重试';
+        this.resultMessage = error.message || '交易过程中发生错误，请稍后重试';
       } finally {
-        this.showConfirmationPopup = false;
-        this.showResultPopup = true;
+        this.$refs.resultPopup.open();
       }
     },
     closeResultPopup() {
-      this.showResultPopup = false;
+      this.$refs.resultPopup.close();
       // Reset form if the transaction was successful
       if (this.transactionSuccess) {
         this.amount = '';
@@ -403,6 +479,141 @@ export default {
         console.error('Error fetching transaction history:', error);
       }
     },
+    showCustomOrder(type) {
+      this.customOrderType = type;
+      // Show quantity input popup first
+      this.$refs.qtyInputPopup.open();
+    },
+    closeCustomOrder() {
+      this.$refs.customOrderPopup.close();
+    },
+    setMaxCustomAmount() {
+      if (this.customOrderType === 'BUY' && this.customPrice) {
+        this.customAmount = (parseFloat(this.availableBalance) / parseFloat(this.customPrice)).toFixed(4);
+      } else {
+        this.customAmount = this.availableBalance;
+      }
+    },
+    async submitCustomOrder() {
+      if (!this.customPrice || !this.customAmount) {
+        uni.showToast({
+          title: '请输入价格和数量',
+          icon: 'none'
+        });
+        return;
+      }
+
+      const totalAmount = this.customPrice * this.customAmount;
+      const maxAmount = this.customOrderType === 'BUY' 
+        ? parseFloat(this.availableBalance)
+        : parseFloat(this.availableBalance) / parseFloat(this.customPrice);
+
+      if (this.customAmount > maxAmount) {
+        uni.showToast({
+          title: '超出可用余额',
+          icon: 'none'
+        });
+        return;
+      }
+
+      // Close the custom order popup
+      this.closeCustomOrder();
+
+      // Show the confirmation popup with the custom order details
+      this.amount = this.customAmount;
+      this.price = this.customPrice;
+      this.showConfirmation(this.customOrderType.toLowerCase());
+    },
+    closeOrderSelect() {
+      this.$refs.orderSelectPopup.close();
+      this.selectedOrders = [];
+    },
+    selectOrder(order) {
+      const index = this.selectedOrders.indexOf(order);
+      if (index === -1) {
+        this.selectedOrders.push(order);
+      } else {
+        this.selectedOrders.splice(index, 1);
+      }
+    },
+    submitSelectedOrders() {
+      if (this.selectedOrders.length === 0) {
+        uni.showToast({
+          title: '请选择订单',
+          icon: 'none'
+        });
+        return;
+      }
+
+      // Calculate total quantity and average price
+      const totalQty = this.selectedOrders.reduce((sum, order) => sum + parseFloat(order.quantity), 0);
+      const totalValue = this.selectedOrders.reduce((sum, order) => sum + (parseFloat(order.quantity) * parseFloat(order.price)), 0);
+      const avgPrice = totalValue / totalQty;
+
+      // Set the values and show confirmation
+      this.amount = totalQty.toFixed(4);
+      this.price = avgPrice.toFixed(4);
+      
+      this.closeOrderSelect();
+      this.showConfirmation(this.customOrderType.toLowerCase());
+    },
+    async fetchRawOrders() {
+      try {
+        this.rawOrders = await fetchRawOrderBook('SEE', 'USDT');
+      } catch (error) {
+        console.error('Error fetching raw orders:', error);
+      }
+    },
+    confirmQuantity() {
+      if (!this.customQty || parseFloat(this.customQty) <= 0) {
+        uni.showToast({
+          title: '请输入有效数量',
+          icon: 'none'
+        });
+        return;
+      }
+
+      // Close quantity popup and open order selection popup
+      this.$refs.qtyInputPopup.close();
+      this.fetchRawOrders().then(() => {
+        this.$refs.orderSelect.open();
+      });
+    },
+    async handleOrderSelection(orderDetails) {
+      try {
+        const userId = localStorage.getItem('userId');
+        const oneYearFromNow = new Date();
+        oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+        // Extract just the orderIds from the orderDetails
+        const selectedOrderIds = orderDetails.map(detail => detail.orderId);
+
+        const result = await fillSelectedOrders({
+          userId,
+          orderType: this.customOrderType,
+          baseTokenSymbol: 'SEE',
+          quoteTokenSymbol: 'USDT',
+          qty: parseFloat(this.customQty),
+          selectedOrderIds, // Now just sending array of IDs
+          expirationDate: oneYearFromNow.toISOString()
+        });
+
+        if (result) {
+          this.transactionSuccess = true;
+          this.resultMessage = '订单已成功提交';
+          await this.fetchOrderBook();
+          await this.fetchUserBalances();
+          await this.fetchTransactionHistory();
+        }
+      } catch (error) {
+        console.error('Error submitting orders:', error);
+        this.transactionSuccess = false;
+        this.resultMessage = error.message || '订单提交失败';
+      } finally {
+        this.$refs.resultPopup.open();
+        this.customQty = '';
+      }
+    }
   },
   mounted() {
     this.fetchOrderBook();

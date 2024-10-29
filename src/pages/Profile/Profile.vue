@@ -23,8 +23,18 @@
         <text class="wallet-title">钱包总资产 (USDT)</text>
         <text class="wallet-network">网络: BSC/BEP20</text>
       </view>
-      <text class="wallet-balance">{{ parseFloat(usdtWalletBalance).toFixed(4) }}</text>
-      <text class="wallet-address">钱包地址: {{ truncatedAddress }}</text>
+      <view class="balance-container" style="display: flex; align-items: center;">
+        <text class="wallet-balance">{{ parseFloat(usdtWalletBalance).toFixed(4) }}</text>
+        <button class="refresh-button" @click="refreshBalance" style="margin-left: 10px;">
+          <image src="/static/refresh-icon.png" :class="{'rotating': isRefreshing}" class="refresh-icon"></image>
+        </button>
+      </view>
+      <view class="wallet-address-container" style="display: flex; align-items: center;">
+        <text class="wallet-address">钱包地址: {{ truncatedAddress }}</text>
+        <button class="copy-button" @click="copyAddress" style="margin-left: 10px;">
+          <image :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="copy-icon"></image>
+        </button>
+      </view>
     </view>
     
     <view class="quick-actions">
@@ -77,7 +87,7 @@
 
 <script>
 import BottomMenu from '@/components/BottomMenu.vue';
-import { fetchUserBalancesWithDetails } from '@/services/userService';
+import { fetchUserBalancesWithDetails, checkWalletDeposits } from '@/services/userService';
 
 export default {
   name: 'Profile',
@@ -90,7 +100,9 @@ export default {
       address: '',
       balances: [],
       usdtWalletBalance: '0',
-      truncatedAddress: ''
+      truncatedAddress: '',
+      isCopied: false,
+      isRefreshing: false
     };
   },
   mounted() {
@@ -144,8 +156,15 @@ export default {
           break;
         case 'receive':
           console.log('Receive action clicked');
+          if (!this.address) {
+            uni.showToast({
+              title: '钱包地址未获取',
+              icon: 'none'
+            });
+            return;
+          }
           uni.navigateTo({
-            url: '/pages/Wallet/Receive',
+            url: `/pages/Wallet/Receive?address=${this.address}`,
             success: function() {
               console.log('Navigation to Receive page successful');
             },
@@ -209,8 +228,61 @@ export default {
       uni.navigateTo({
         url: '/pages/Wallet/Convert'
       });
+    },
+    copyAddress() {
+      if (!this.address) {
+        uni.showToast({
+          title: '钱包地址未获取',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      uni.setClipboardData({
+        data: this.address,
+        success: () => {
+          this.isCopied = true;
+          uni.showToast({
+            title: '地址已复制',
+            icon: 'success'
+          });
+          
+          setTimeout(() => {
+            this.isCopied = false;
+          }, 3000);
+        }
+      });
+    },
+    async refreshBalance() {
+      try {
+        this.isRefreshing = true;
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          uni.showToast({
+            title: '请先登录',
+            icon: 'none'
+          });
+          return;
+        }
+        
+        const result = await checkWalletDeposits(userId);
+        // After checking deposits, refresh the balance display
+        await this.fetchUserData();
+        
+        uni.showToast({
+          title: result.message || '余额已更新',
+          icon: 'success'
+        });
+      } catch (error) {
+        console.error('Error refreshing balance:', error);
+        uni.showToast({
+          title: '更新失败',
+          icon: 'none'
+        });
+      } finally {
+        this.isRefreshing = false;
+      }
     }
   }
 };
 </script>
-
