@@ -1658,10 +1658,12 @@ page {
 .copy-button {
   background: none;
   border: none;
-  padding: 5px;
+ 
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
 .copy-icon {

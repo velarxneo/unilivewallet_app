@@ -5,16 +5,19 @@
       <text class="uni-title">收款</text>
     </view>
     
-    <view class="network-info">
-      <text class="network-label">网络</text>
-      <text class="network-value">BSC/BEP20</text>
+    <view class="section">
+      <text>网络</text>
+      <text>BSC/BEP20</text>
     </view>
 
-    <view class="wallet-address">
-      <text class="address">{{ userAddress }}</text>
-      <button class="copy-button" @click="copyAddress">
-        <image :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="copy-icon"></image>
+    <view class="section">
+      <text class="input-label">钱包地址</text>
+      <view class="input-wrapper">
+        <text class="address">{{ userAddress }}</text>
+        <button class="copy-button" @click="copyAddress">
+        <img :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="copy-icon" />
       </button>
+      </view>
     </view>
 
     <view class="qr-code">
