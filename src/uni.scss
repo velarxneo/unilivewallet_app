@@ -1696,3 +1696,47 @@ page {
   }
 }
 
+.transaction-icon {
+  &.transfer {
+    background-color: #ff9500; // Orange color for transfer transactions
+  }
+}
+
+.transaction-address {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.transaction-date-container {
+  display: flex;
+  align-items: center;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.transaction-amount-container {
+  text-align: right;
+}
+
+.transaction-amount {
+  font-size: 16px;
+  font-weight: bold;
+  
+  &.amount-positive {
+    color: #4cd964;
+  }
+  
+  &.amount-negative {
+    color: #ff3b30;
+  }
+}
+
+.transaction-fee {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}

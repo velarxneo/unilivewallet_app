@@ -51,15 +51,14 @@
       </view>
     </view>
 
-
     <view class="footer">
-      <button class="uni-btn" @click="showConfirmation">确定</button>
+      <button class="uni-btn" @click="handleConfirm">确定</button>
     </view>
 
-    <!-- Add this confirmation popup -->
-    <view v-if="showConfirmationPopup" class="confirmation-popup">
-      <view class="confirmation-content">
-        <view class="confirmation-title">转账信息</view>
+    <!-- Confirmation Popup -->
+    <uni-popup ref="popup" type="center">
+      <view class="popup-content">
+        <view class="confirmation-title">确认转账</view>
         <view class="confirmation-details">
           <view class="detail-item-column">
             <text>{{ sendType === 'address' ? '钱包地址' : '用户ID' }}</text>
@@ -71,36 +70,62 @@
           </view>
           <view class="detail-item-column">
             <text>转账数量</text>
-            <text>{{ parseFloat(amount).toFixed(4).padEnd(4, '0')  || '0.0000' }}</text>
+            <text>{{ parseFloat(amount).toFixed(4).padEnd(4, '0') || '0.0000' }}</text>
+          </view>
+          <template v-if="sendType === 'address' && !isInternalTransfer">
+            <view class="detail-item-column">
+              <text>Gas费用</text>
+              <text>{{ parseFloat(gasFee).toFixed(4) }} {{ selectedToken }}</text>
+            </view>
+            <view class="detail-item-column">
+              <text>手续费</text>
+              <text>{{ parseFloat(transferFee).toFixed(4) }} {{ selectedToken }}</text>
+            </view>
+          </template>
+          <view v-else class="detail-item-column">
+            <text>手续费</text>
+            <text>{{ parseFloat(transferFee).toFixed(4) }} {{ selectedToken }}</text>
+          </view>
+          <view class="detail-item-column">
+            <text>实际到账</text>
+            <text>{{ (parseFloat(amount) - parseFloat(totalFee)).toFixed(4) }} {{ selectedToken }}</text>
           </view>
         </view>
         <view class="confirmation-buttons">
-          <button class="btn-cancel" @click="cancelConfirmation">取消</button>
-          <button class="btn-confirm" @click="confirmTransfer">确定</button>
+          <button class="btn-cancel" :disabled="isProcessing" @click="cancelConfirmation">取消</button>
+          <button class="btn-confirm" :disabled="isProcessing" @click="confirmTransfer">
+            <text v-if="!isProcessing">确定</text>
+            <view v-else class="loading-container">
+              <image src="/static/loading.png" class="loading-icon rotating"></image>
+              <text>处理中...</text>
+            </view>
+          </button>
         </view>
       </view>
-    </view>
+    </uni-popup>
 
-    <!-- Add the ResultPopup component -->
-    <ResultPopup 
-      :show="showResultPopup"
-      :success="transactionSuccess"
-      :message="resultMessage"
-      :amount="amount"
-      :token="selectedToken"
-      @close="closeResultPopup"
-    />
+    <!-- Result Popup -->
+    <uni-popup ref="resultPopup" type="center" :animation="true">
+      <view class="popup-content">
+        <view class="result-icon">
+          <uni-icons 
+            :type="transferSuccess ? 'checkmarkempty' : 'closeempty'" 
+            size="50" 
+            :color="transferSuccess ? '#4CD964' : '#FF3B30'"
+          />
+        </view>
+        <text class="result-title">{{ transferSuccess ? '转账成功' : '转账失败' }}</text>
+        <text class="result-message">{{ resultMessage }}</text>
+        <button class="uni-btn" @click="closeResult">确定</button>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script>
-import { fetchUserBalancesWithDetails, sendToAddress, sendToUserId } from '@/services/userService';
-import ResultPopup from '@/components/ResultPopup.vue';
+import { fetchUserBalancesWithDetails, sendToAddress, sendToUserId, isInternalAddress, getEstimatedGasFee, withdrawBalance, fetchTransferFee } from '@/services/userService';
 
 export default {
-  components: {
-    ResultPopup
-  },
   data() {
     return {
       sendType: 'address',
@@ -109,10 +134,13 @@ export default {
       selectedToken: '',
       userBalances: [],
       userId: '',
-      showConfirmationPopup: false,
-      showResultPopup: false,
-      transactionSuccess: false,
+      transferSuccess: false,
       resultMessage: '',
+      transferFee: '0',
+      gasFee: '0',
+      isInternalTransfer: false,
+      totalFee: '0',
+      isProcessing: false,
     };
   },
   computed: {
@@ -144,7 +172,7 @@ export default {
     setMaxAmount() {
       this.amount = this.availableBalance.toString();
     },
-    showConfirmation() {
+    async handleConfirm() {
       if (!this.recipient || !this.amount || !this.selectedToken) {
         uni.showToast({
           title: '请填写所有必填字段',
@@ -161,72 +189,127 @@ export default {
         return;
       }
 
-      this.showConfirmationPopup = true;
+      try {
+        if (this.sendType === 'address') {
+          const result = await isInternalAddress(this.recipient);
+          this.isInternalTransfer = result.isInternal;
+          
+          if (result.isInternal) {
+            const feeData = await fetchTransferFee(this.selectedToken, this.amount);
+            this.transferFee = feeData.totalFee;
+            this.totalFee = this.transferFee;
+            this.sendType = 'address';
+          } else {
+            const [gasFeeResult, transferFeeData] = await Promise.all([
+              getEstimatedGasFee(this.recipient, this.selectedToken, parseFloat(this.amount)),
+              fetchTransferFee(this.selectedToken, this.amount)
+            ]);
+            
+            this.gasFee = gasFeeResult.estimatedGasFee;
+            this.transferFee = transferFeeData.totalFee;
+            this.totalFee = (parseFloat(this.gasFee) + parseFloat(this.transferFee)).toFixed(4);
+          }
+        } else {
+          const feeData = await fetchTransferFee(this.selectedToken, this.amount);
+          this.transferFee = feeData.totalFee;
+          this.totalFee = this.transferFee;
+        }
+
+        this.$refs.popup.open();
+      } catch (error) {
+        console.error('Error checking address:', error);
+        uni.showToast({
+          title: '地址检查失败',
+          icon: 'none'
+        });
+      }
     },
     cancelConfirmation() {
-      this.showConfirmationPopup = false;
-      // Don't show any result popup when cancelling
+      this.$refs.popup.close();
     },
     async confirmTransfer() {
-      this.showConfirmationPopup = false;
+      if (this.isProcessing) return;
+      
+      this.isProcessing = true;
       try {
         let result;
-        if (this.sendType === 'address') {
-          result = await this.sendToAddress();
-        } else {
-          result = await this.sendToUserId();
-        }
         
-        if (result && result.success) {
-          this.showTransferResult(true, '转账成功');
+        if (this.sendType === 'address' && !this.isInternalTransfer) {
+          result = await withdrawBalance(
+            this.userId,
+            this.selectedToken,
+            parseFloat(this.amount),
+            this.recipient
+          );
         } else {
-          throw new Error(result.message || '转账失败');
+          if (this.sendType === 'address') {
+            result = await this.sendToAddress();
+          } else {
+            result = await this.sendToUserId();
+          }
         }
+
+        this.transferSuccess = true;
+        this.resultMessage = `成功转账 ${this.amount} ${this.selectedToken}`;
+        this.$refs.popup.close();
+        this.$refs.resultPopup.open();
       } catch (error) {
-        this.showTransferResult(false, error.message);
+        this.transferSuccess = false;
+        this.resultMessage = error.message || '转账失败';
+        this.$refs.popup.close();
+        this.$refs.resultPopup.open();
+      } finally {
+        this.isProcessing = false;
       }
     },
     async sendToAddress() {
-      return await sendToAddress(
-        this.userId,
-        this.recipient,
-        this.selectedToken,
-        parseFloat(this.amount)
-      );
+      try {
+        const response = await sendToAddress(
+          this.userId,
+          this.recipient,
+          this.selectedToken,
+          parseFloat(this.amount)
+        );
+        return response;
+      } catch (error) {
+        throw error;
+      }
     },
     async sendToUserId() {
-      return await sendToUserId(
-        this.userId,
-        this.recipient,
-        this.selectedToken,
-        parseFloat(this.amount)
-      );
-    },
-    showTransferResult(success, message) {
-      this.transactionSuccess = success;
-      this.resultMessage = message;
-      this.showResultPopup = true;
-    },
-    closeResultPopup() {
-      this.showResultPopup = false;
-      if (this.transactionSuccess) {
-        this.goBack();
+      try {
+        const response = await sendToUserId(
+          this.userId,
+          this.recipient,
+          this.selectedToken,
+          parseFloat(this.amount)
+        );
+        return response;
+      } catch (error) {
+        throw error;
       }
     },
     goBack() {
       uni.reLaunch({
-          url: '/pages/Profile/Profile',
-          success: function() {
-            console.log('Successfully relaunched Profile page');
-          },
-          fail: function(err) {
-            console.error('Failed to relaunch OTCTrading page:', err);
-          }
-        });
+        url: '/pages/Profile/Profile',
+        success: function() {
+          console.log('Successfully relaunched Profile page');
+        },
+        fail: function(err) {
+          console.error('Failed to relaunch Profile page:', err);
+        }
+      });
     },
     onTokenChange(e) {
       const index = e.detail.value;
       this.selectedToken = this.tokenOptions[index];
+    },
+    closeResult() {
+      this.$refs.resultPopup.close();
+      if (this.transferSuccess) {
+        setTimeout(() => {
+          this.goBack();
+        }, 500);
+      }
     },
   },
   onLoad() {
@@ -235,3 +318,43 @@ export default {
 };
 </script>
 
+<style lang="scss" scoped>
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.loading-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-confirm {
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel {
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+</style>

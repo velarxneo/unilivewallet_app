@@ -46,7 +46,9 @@ function calculateUsdtWalletBalance(balances) {
 
 export async function sendToAddress(senderUserId, recipientAddress, tokenSymbol, qty) {
   try {
-    const response = await fetch('http://localhost:8081/api/wallet/send-to-address', {
+    console.log('Sending request with:', { senderUserId, recipientAddress, tokenSymbol, qty });
+    
+    const response = await fetch(`${API_BASE_URL}/api/wallet/send-to-address`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,17 +57,19 @@ export async function sendToAddress(senderUserId, recipientAddress, tokenSymbol,
         senderUserId,
         recipientAddress,
         tokenSymbol,
-        qty
+        qty: parseFloat(qty) // Ensure qty is a number
       })
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || '转账失败');
+      throw new Error(data.message || '转账失败');
     }
     
-    return await response.json();
+    return data;
   } catch (error) {
+    console.error('Send to address error:', error);
     throw error;
   }
 }
@@ -280,6 +284,65 @@ export async function checkWalletDeposits(userId) {
     
   } catch (error) {
     console.error('Error checking wallet deposits:', error);
+    throw error;
+  }
+}
+
+// Add this new function to check if address is internal
+export async function isInternalAddress(address) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet/is-internal-address?address=${address}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to check address');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error checking internal address:', error);
+    throw error;
+  }
+}
+
+export async function getEstimatedGasFee(toAddress, token, qty) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet/get-estimated-gas-fee?to-address=${toAddress}&token=${token}&qty=${qty}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to get gas fee estimate');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting gas fee estimate:', error);
+    throw error;
+  }
+}
+
+export async function withdrawBalance(userId, tokenSymbol, qty, recipientAddress) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wallet/balances/withdraw`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        tokenSymbol,
+        qty,
+        recipientAddress
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '提现失败');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error withdrawing balance:', error);
     throw error;
   }
 }

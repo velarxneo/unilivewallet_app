@@ -52,7 +52,7 @@
       </view>
       <view class="action-item" @click="handleAction('convert')">
         <uni-icons type="refresh" size="30"></uni-icons>
-        <text>兑换</text>
+        <text>闪兑</text>
       </view>
     </view>
     

@@ -20,7 +20,7 @@
           <uni-icons type="arrow-down" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">Deposit</text>
+          <text class="transaction-address">存款</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>
@@ -38,7 +38,7 @@
           <uni-icons type="arrow-up" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">To User ID: {{ transaction.receiverUserId }}</text>
+          <text class="transaction-address">转到UID {{ transaction.receiverUserId }}</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>
@@ -59,7 +59,7 @@
           <uni-icons type="arrow-up" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">To Address: {{ transaction.receiverAddress.slice(0, 6) }}...{{ transaction.receiverAddress.slice(-4) }}</text>
+          <text class="transaction-address">转到地址 {{ transaction.receiverAddress.slice(0, 6) }}...{{ transaction.receiverAddress.slice(-4) }}</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>
@@ -80,7 +80,7 @@
           <uni-icons type="loop" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">Balance Transfer</text>
+          <text class="transaction-address">划转</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>
@@ -95,23 +95,6 @@
         </view>
       </view>
       
-      <!-- Received transaction -->
-      <view v-else-if="transaction.receiverUserId === userId" class="section-column" @click="showTransactionDetails(transaction)">
-        <view class="transaction-icon receive">
-          <uni-icons type="arrow-down" size="20" color="#fff"></uni-icons>
-        </view>
-        <view class="transaction-details">
-          <text class="transaction-address">From: {{ transaction.senderUserId ? transaction.senderUserId : (transaction.senderAddress ? `${transaction.senderAddress.slice(0, 6)}...${transaction.senderAddress.slice(-4)}` : 'Unknown') }}</text>
-          <view class="transaction-date-container">
-            <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
-          </view>
-        </view>
-        <view class="transaction-amount-container">
-          <text class="transaction-amount amount-positive">
-            +{{ (parseFloat(transaction.amount) - parseFloat(transaction.feeQty)).toFixed(4) }} {{ tokenSymbol }}
-          </text>
-        </view>
-      </view>
 
       <!-- Same User ID for Sender and Receiver -->
       <view v-else-if="transaction.senderUserId === transaction.receiverUserId" class="section-column" @click="showTransactionDetails(transaction)">
@@ -119,7 +102,7 @@
           <uni-icons type="loop" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">Internal Transfer</text>
+          <text class="transaction-address">内部转账</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>
@@ -127,6 +110,50 @@
         <view class="transaction-amount-container">
           <text class="transaction-amount amount-neutral">
             {{ parseFloat(transaction.amount).toFixed(4) }} {{ tokenSymbol }}
+          </text>
+          <text class="transaction-fee" v-if="transaction.feeQty">
+            Fee: {{ transaction.feeQty }} {{ tokenSymbol }}
+          </text>
+        </view>
+      </view>
+
+      <!-- Withdrawal transaction -->
+      <view v-if="transaction.transactionCode.code === 'WDR'" class="section-column" @click="showTransactionDetails(transaction)">
+        <view class="transaction-icon send">
+          <uni-icons type="arrow-up" size="20" color="#fff"></uni-icons>
+        </view>
+        <view class="transaction-details">
+          <text class="transaction-address">提取地址 {{ transaction.receiverAddress.slice(0, 6) }}...{{ transaction.receiverAddress.slice(-4) }}</text>
+          <view class="transaction-date-container">
+            <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
+          </view>
+        </view>
+        <view class="transaction-amount-container">
+          <text class="transaction-amount amount-negative">
+            -{{ parseFloat(transaction.amount).toFixed(4) }} {{ tokenSymbol }}
+          </text>
+          <text class="transaction-fee">
+            Fee: {{ transaction.feeQty }} {{ tokenSymbol }}
+          </text>
+        </view>
+      </view>
+
+      <!-- Convert transaction -->
+      <view v-if="transaction.transactionCode.code === 'CONVERT'" class="section-column" @click="showTransactionDetails(transaction)">
+        <view class="transaction-icon transfer">
+          <uni-icons type="refresh" size="20" color="#fff"></uni-icons>
+        </view>
+        <view class="transaction-details">
+          <text class="transaction-address">
+            {{ transaction.senderUserId === userId ? '兑换 DOU' : '兑换 USDT' }}
+          </text>
+          <view class="transaction-date-container">
+            <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
+          </view>
+        </view>
+        <view class="transaction-amount-container">
+          <text class="transaction-amount" :class="transaction.senderUserId === userId ? 'amount-negative' : 'amount-positive'">
+            {{ transaction.senderUserId === userId ? '-' : '+' }}{{ parseFloat(transaction.amount).toFixed(4) }} {{ tokenSymbol }}
           </text>
           <text class="transaction-fee" v-if="transaction.feeQty">
             Fee: {{ transaction.feeQty }} {{ tokenSymbol }}
@@ -234,50 +261,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.transaction-icon {
-  &.transfer {
-    background-color: #ff9500; // Orange color for transfer transactions
-  }
-}
-
-.transaction-address {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.transaction-date-container {
-  display: flex;
-  align-items: center;
-}
-
-.transaction-date {
-  font-size: 12px;
-  color: #999;
-}
-
-.transaction-amount-container {
-  text-align: right;
-}
-
-.transaction-amount {
-  font-size: 16px;
-  font-weight: bold;
-  
-  &.amount-positive {
-    color: #4cd964;
-  }
-  
-  &.amount-negative {
-    color: #ff3b30;
-  }
-}
-
-.transaction-fee {
-  font-size: 12px;
-  color: #999;
-  margin-top: 4px;
-}
-</style>

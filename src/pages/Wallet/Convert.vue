@@ -2,20 +2,17 @@
   <view class="uni-container">
     <view class="header">
       <button class="back-button" @click="goBack"><uni-icons type="back" size="24" color="#000"></uni-icons></button>
-      <text class="uni-title">兑兑</text>
+      <text class="uni-title">闪兑</text>
     </view>
 
-    <view class="balance-info">
-      <text>USDT</text>
-      <text>DOU</text>
-      <text>{{ fromBalance }}</text>
-      <text>{{ toBalance }}</text>
-      <text class="available-text">可兑USDT</text>
-      <text class="all-button" @click="setMaxAmount">全部</text>
-      <text>{{ maxAmount }}</text>
+    <view class="section">
+        <view class="balance">
+            <text>可兑：{{ maxAmount }} USDT</text>
+            <text class="all-button" @click="setMaxAmount">全部</text>
+        </view>
     </view>
 
-    <view class="conversion-form">
+    <view class="section">
       <view class="input-group">
         <text>USDT数量</text>
         <input type="number" v-model="fromAmount" @input="updateToAmount" placeholder="输入USDT数量" />
@@ -31,8 +28,8 @@
       </view>
     </view>
 
-    <view class="conversion-form">
-    <view class="conversion-notice">
+    <view class="section">
+    <view class="notice">
       <uni-icons type="info" size="16" color="#FF6B35"></uni-icons>
       <text class="notice-text">温馨提示</text>
     </view>
@@ -40,10 +37,10 @@
       <text>该豆仅用于购买Unilive APP服务或商品</text>
     </view>
 </view>
-    <view class="conversion-history">
+    <view class="section">
       <view class="history-header">
         <uni-icons type="bars" size="16" color="#FF6B35"></uni-icons>
-        <text class="history-title">兑兑记录</text>
+        <text class="history-title">闪兑记录</text>
       </view>
       <view v-for="(record, index) in conversionHistory" :key="index" class="history-item">
         <view class="history-item-main">
@@ -71,9 +68,9 @@
       <button class="uni-btn" @click="handleConvert" :disabled="!canConvert">确定兑换</button>
     </view>
 
-    <!-- Add these new components before the closing template tag -->
-    <view v-if="showConfirmation" class="confirmation-popup">
-      <view class="confirmation-content">
+    <!-- Confirmation Popup -->
+    <uni-popup ref="confirmPopup" type="center">
+      <view class="popup-content">
         <view class="confirmation-title">确认兑换</view>
         <view class="confirmation-details">
           <view class="detail-item">
@@ -90,25 +87,33 @@
           </view>
         </view>
         <view class="confirmation-buttons">
-          <button class="btn-cancel" @click="cancelConversion">取消</button>
-          <button class="btn-confirm" @click="confirmConversion">确认</button>
+          <button class="btn-cancel" :disabled="isProcessing" @click="cancelConversion">取消</button>
+          <button class="btn-confirm" :disabled="isProcessing" @click="confirmConversion">
+            <text v-if="!isProcessing">确认</text>
+            <view v-else class="loading-container">
+              <image src="/static/loading.png" class="loading-icon rotating"></image>
+              <text>处理中...</text>
+            </view>
+          </button>
         </view>
       </view>
-    </view>
+    </uni-popup>
 
-    <view v-if="showResult" class="result-popup">
-      <view class="result-content">
+    <!-- Result Popup -->
+    <uni-popup ref="resultPopup" type="center">
+      <view class="popup-content">
         <view class="result-icon">
-          <uni-icons :type="resultSuccess ? 'checkmarkempty' : 'closeempty'" 
-                     size="50" 
-                     :color="resultSuccess ? '#4CD964' : '#FF3B30'">
-          </uni-icons>
+          <uni-icons 
+            :type="resultSuccess ? 'checkmarkempty' : 'closeempty'" 
+            size="50" 
+            :color="resultSuccess ? '#4CD964' : '#FF3B30'"
+          />
         </view>
         <text class="result-title">{{ resultSuccess ? '兑换成功' : '兑换失败' }}</text>
         <text class="result-message">{{ resultMessage }}</text>
-        <button class="btn-confirm" @click="closeResult">确定</button>
+        <button class="uni-btn" @click="closeResult">确定</button>
       </view>
-    </view>
+    </uni-popup>
   </view>
 </template>
 
@@ -134,7 +139,8 @@ export default {
       showConfirmation: false,
       showResult: false,
       resultSuccess: false,
-      resultMessage: ''
+      resultMessage: '',
+      isProcessing: false,
     };
   },
   computed: {
@@ -197,18 +203,28 @@ export default {
         });
         return;
       }
-      this.showConfirmation = true;
+      this.$refs.confirmPopup.open();
     },
     cancelConversion() {
-      this.showConfirmation = false;
+      this.$refs.confirmPopup.close();
     },
     async confirmConversion() {
-      this.showConfirmation = false;
+      if (this.isProcessing) return;
+      
+      this.isProcessing = true;
       try {
-        const result = await convertTokens(this.userId, 'USDT', 'DOU', parseFloat(this.fromAmount));
+        const result = await convertTokens(
+          this.userId,
+          'USDT',
+          'DOU',
+          parseFloat(this.fromAmount)
+        );
+        
         this.resultSuccess = true;
         this.resultMessage = `成功兑换 ${this.toAmount} DOU`;
-        this.showResult = true;
+        this.$refs.confirmPopup.close();
+        this.$refs.resultPopup.open();
+        
         await this.fetchBalances();
         this.page = 0;
         this.conversionHistory = [];
@@ -219,12 +235,19 @@ export default {
         console.error('Error converting tokens:', error);
         this.resultSuccess = false;
         this.resultMessage = error.message || '兑换失败';
-        this.showResult = true;
+        this.$refs.confirmPopup.close();
+        this.$refs.resultPopup.open();
+      } finally {
+        this.isProcessing = false;
       }
     },
     closeResult() {
-      this.showResult = false;
-      
+      this.$refs.resultPopup.close();
+      if (this.resultSuccess) {
+        setTimeout(() => {
+          this.goBack();
+        }, 500);
+      }
     },
     goBack() {
         uni.reLaunch({
@@ -291,214 +314,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.token-pair {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.token {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.balance-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.available-text {
-  color: #666;
-}
-
-
-.conversion-notice {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 10px;
-}
-
-.notice-text {
-  color: #FF6B35;
-  font-weight: bold;
-}
-
-.notice-content {
-  color: #666;
-  margin-bottom: 20px;
-}
-
-.conversion-history {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-.history-header {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 15px;
-}
-
-.history-title {
-  color: #FF6B35;
-  font-weight: bold;
-}
-
-.history-item {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.history-item-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.record-description {
-  color: #333;
-}
-
-.record-amount {
-  width: 100%;
-  text-align: right;
-  &.amount-positive {
-    color: #4CD964;
-  }
-
-  &.amount-negative {
-    color: #FF3B30;
-  }
-}
-
-.record-date {
-  color: #999;
-  font-size: 12px;
-  padding-left: 0;
-}
-
-.record-status {
-  color: #4CD964;
-  text-align: right;
-}
-.conversion-form {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.confirmation-popup,
-.result-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.confirmation-content,
-.result-content {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  width: 80%;
-  max-width: 300px;
-}
-
-.confirmation-title {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.confirmation-details {
-  margin-bottom: 20px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  
-  text:first-child {
-    color: #999;
-  }
-  
-  text:last-child {
-    font-weight: bold;
-  }
-}
-
-.confirmation-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.btn-cancel,
-.btn-confirm {
-  flex: 1;
-  height: 40px;
-  border-radius: 20px;
-  border: none;
-  font-size: 16px;
-}
-
-.btn-cancel {
-  background-color: #f5f5f5;
-  color: #333;
-}
-
-.btn-confirm {
-  background-color: #FF6B35;
-  color: #fff;
-}
-
-.result-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.result-icon {
-  margin-bottom: 15px;
-}
-
-.result-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.result-message {
-  color: #666;
-  margin-bottom: 20px;
-}
-</style>

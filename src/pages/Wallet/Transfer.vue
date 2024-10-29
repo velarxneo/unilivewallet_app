@@ -44,7 +44,7 @@
         <text>划转到OTC账户的资产仅用于场外交易</text>
       </view>
     </view>
-    <view class="transfer-history">
+    <view class="section">
       <view class="history-header">
         <uni-icons type="bars" size="16" color="#FF6B35"></uni-icons>
         <text class="history-title">划转记录</text>
