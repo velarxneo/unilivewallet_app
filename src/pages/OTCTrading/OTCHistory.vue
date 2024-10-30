@@ -59,7 +59,7 @@
 
     <!-- Cancel Confirmation Popup -->
     <view v-if="showCancelConfirmationPopup" class="confirmation-popup">
-      <view class="confirmation-content">
+      <view class="popup-content">
         <text class="confirmation-title">确认取消订单</text>
         <text class="confirmation-subtitle">您确认要取消这个订单吗？</text>
         <view class="confirmation-details">

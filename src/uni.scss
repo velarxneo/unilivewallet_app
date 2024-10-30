@@ -26,6 +26,8 @@ $uni-text-color-inverse: #fff; // 反色
 $uni-text-color-grey: #999; // 辅助灰色，如加载更多的提示信息
 $uni-text-color-placeholder: #808080;
 $uni-text-color-disable: #c0c0c0;
+$uni-text-color-card-inverse: #fff;
+$uni-text-color-card: #f0ad4e;
 
 /* 背景颜色 */
 $uni-bg-color: #f8f8f8;
@@ -75,7 +77,14 @@ $uni-font-size-subtitle: 18px;
 $uni-color-paragraph: #3f536e; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
 
-
+/* Colors */
+$primary-color: #FF6B6B;
+$secondary-color: #FF3B30;
+$background-color: #FF6B35; // Update this to match the orange background in the image
+$text-color: #333333;
+$light-text-color: #999999;
+$table-header-color: #fff3df;
+$section-background-color: #ffffff;
 // Add these if they don't already exist in your uni.scss file
 
 .uni-container {
@@ -124,7 +133,6 @@ $uni-font-size-paragraph: 15px;
 }
 
 .info {
-  font-size: 14px;
   color: $uni-text-color;
   line-height: 1.5;
 
@@ -146,7 +154,6 @@ $uni-font-size-paragraph: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
   color: $uni-text-color;
 }
 
@@ -231,117 +238,8 @@ $uni-font-size-paragraph: 15px;
   font-weight: bold;
 }
 
-// Add these styles at the end of your existing uni.scss file
-
-.otc-trading {
-  .currency-selector {
-    display: flex;
-    margin-bottom: 20px;
-
-    .currency-btn {
-      flex: 1;
-      padding: 10px;
-      background-color: $uni-bg-color-grey;
-      border: none;
-      color: $uni-text-color;
-      font-size: $uni-font-size-lg;
-      cursor: pointer;
-
-      &.active {
-        background-color: $uni-color-primary;
-        color: $uni-text-color-inverse;
-      }
-    }
-  }
-
-  .total-price {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    font-size: $uni-font-size-lg;
-
-    .price {
-      font-weight: bold;
-      color: $uni-color-error;
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-
-    button {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: $uni-border-radius-base;
-      font-size: $uni-font-size-lg;
-      cursor: pointer;
-    }
-
-    .sell-btn {
-      background-color: $uni-color-error;
-      color: $uni-text-color-inverse;
-      height: 26px;
-      border-radius: 4px;
-    }
-
-    .buy-btn {
-      background-color: $uni-color-success;
-      color: $uni-text-color-inverse;
-      height: 26px;
-      border-radius: 4px;
-    }
-  }
-
-  .order-tabs {
-    display: flex;
-    margin-bottom: 15px;
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background-color: $uni-bg-color-grey;
-      border: none;
-      color: $uni-text-color;
-      font-size: $uni-font-size-base;
-      cursor: pointer;
-
-      &.active {
-        background-color: $uni-color-primary;
-        color: $uni-text-color-inverse;
-      }
-    }
-  }
-
-  .order-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid $uni-border-color;
-    }
-
-    th {
-      font-weight: bold;
-      color: $uni-text-color-grey;
-    }
-  }
-}
-
-/* Colors */
-$primary-color: #FF6B6B;
-$secondary-color: #FF3B30;
-$background-color: #FF6B35; // Update this to match the orange background in the image
-$text-color: #333333;
-$light-text-color: #999999;
-$table-header-color: #fff3df;
-
 /* Font sizes */
-$body-font-size: 16px; // Base font size
+$body-font-size: 14px; // Base font size
 $font-size-xs: 0.75rem; // 12px
 $font-size-sm: 0.875rem; // 14px
 $font-size-base: 1rem; // 16px
@@ -443,7 +341,6 @@ page {
   text {
     display: block;
     margin-bottom: 5px;
-    color: $uni-text-color;
     padding-bottom: 10px;
   }
 
@@ -454,7 +351,6 @@ page {
     padding: 0 10px;
     border: 1px solid $uni-border-color;
     border-radius: $uni-border-radius-base;
-    font-size: $uni-font-size-base;
     background-color: $uni-bg-color;
   }
 }
@@ -469,8 +365,7 @@ page {
 .picker {
   width: 100px;
   height: 40px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -490,38 +385,8 @@ page {
 
 /* You can add more global styles here */
 
-// OTC Trading styles
-
-
-.otc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.otc-title {
-  font-size: $font-size-xxl;
-  font-weight: bold;
-  color: #FFFFFF; // White color for the title
-}
-
-.otc-history-link {
-  display: flex;
-  align-items: center;
-  //color: $uni-text-color-grey;
-  color: #FFFFFF; // White color for the title
-}
-
 .otc-trading-pair {
   margin-bottom: 20rpx;
-}
-
-.otc-trading-pair-title {
-  font-size: $uni-font-size-base;
-  font-weight: normal;
-  color: #FFFFFF; // White color for the title
-  margin-bottom: 5rpx; // Add some space below the title
 }
 
 .otc-order-selector {
@@ -544,101 +409,6 @@ page {
     }
   }
 
-}
-
-.otc-trade-form {
-  background-color: #fff;
-  border-radius: 10rpx;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-}
-
-.otc-total-price {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.875rem; // 30px
-  
-  .price {
-    color: $uni-color-success;
-    font-weight: bold;
-  }
-}
-
-.otc-action-buttons {
-  display: flex;
-  justify-content: space-between;
-  
-  button {
-    flex: 1;
-    margin: 0 10rpx;
-    color: #fff;
-    border: none;
-    border-radius: 20rpx;
-    padding: 0; // 20px
-    &.btn-buy {
-      background-color: $uni-color-success;
-    }
-    
-    &.btn-sell {
-      background-color: $uni-color-warning;
-    }
-  }
-}
-
-.otc-order-book {
-  background-color: #fff;
-  border-radius: 10rpx;
-  padding: 20rpx;
-}
-
-.otc-section-title {
-  font-size: $font-size-xl;
-  font-weight: bold;
-  margin-bottom: 1.875rem; // 30px
-}
-
-.otc-order-headers {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
-  
-  .buy-header, .sell-header {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    padding: 10rpx; // Added padding
-    
-    view {
-      display: flex;
-      
-      text {
-        margin-left: 20rpx;
-      }
-    }
-  }
-}
-
-.order-select-content {
-  background-color: #fff;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 20px;
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-  position: relative; // Add this
-}
-
-.order-select-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.order-select-title {
-  font-size: 18px;
-  font-weight: bold;
 }
 
 // Login Popup Styles
@@ -735,7 +505,7 @@ page {
 }
 
 .otc-trading-pair-title {
-  font-size: $font-size-xl;
+  font-size: $font-size-lg;
   font-weight: bold;
   color: #FFFFFF;
 }
@@ -744,7 +514,6 @@ page {
   display: flex;
   align-items: center;
   color: #FFFFFF;
-  font-size: $font-size-base;
 
   text {
     margin-right: 5rpx;
@@ -764,7 +533,9 @@ page {
 }
 
 .all-button {
-  color: #007AFF;
+  cursor: pointer; // Added pointer cursor for better UX
+  color: $uni-text-color-card;
+  font-weight: 600;
 }
 
 .footer {
@@ -784,9 +555,13 @@ page {
 .login-button {
   @include button-gradient;
   border-radius: $uni-border-radius-lg;
-  padding: 10px 20px;
-  font-size: $uni-font-size-base;
+  padding: 5px 30px;
   cursor: pointer;
+}
+
+.result-submessage {
+  text-align: center;
+  padding: 10px;
 }
 
 // Update specific button styles
@@ -817,30 +592,12 @@ page {
   
   text {
     color: $uni-text-color-inverse;
-    font-size: $uni-font-size-base;
     font-weight: bold;
   }
 }
 
 
-.otc-header {
-  margin-bottom: 1.25rem;
-}
-
-.otc-trading-pair {
-  margin-bottom: 1.25rem;
-}
-
-.otc-trade-form {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .otc-available-balance {
-  margin-bottom: $uni-font-size-base;
   font-weight: normal;
   color: #333;
   text-align: right;
@@ -863,25 +620,6 @@ page {
   color: #333;
 }
 
-.otc-action-buttons {
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: white;
-    
-    &.btn-buy {
-      background-color: #4cd964;
-    }
-    
-    &.btn-sell {
-      background-color: #ff3b30;
-    }
-  }
-}
 
   .otc-order-book {
     background-color: rgba(255, 255, 255, 0.9);
@@ -989,8 +727,9 @@ page {
 }
 
 .confirmation-title {
+  font-size: $uni-font-size-lg;
+  color: $uni-color-primary;
   width: 100%;
-  font-size: 18px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 10px;
@@ -998,7 +737,6 @@ page {
 
 .confirmation-subtitle {
   width: 100%;
-  font-size: 14px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -1011,7 +749,7 @@ page {
 .detail-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px; 
+  margin-bottom: 5px; 
 }
 
 .detail-item-column {
@@ -1021,7 +759,6 @@ page {
   
   text:first-child {
     color: #999;
-    font-size: 14px;
     margin-bottom: 5px;
   }
   
@@ -1042,7 +779,6 @@ page {
   padding: 10px;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
 }
 
 .btn-cancel {
@@ -1139,23 +875,22 @@ page {
   align-items: center;
 }
 .result-icon {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .result-title {
-  font-size: 18px;
   text-align: center;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .result-message {
-  font-size: 14px;
   text-align: center;
-  margin-bottom: 20px;
+  color: $uni-color-primary;
+  font-weight: bold;
 }
 
 .btn-confirm {
@@ -1163,7 +898,6 @@ page {
   padding: 10px;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
   background-color: $uni-color-primary;
   color: #fff;
 }
@@ -1218,7 +952,6 @@ page {
 }
 
 .transaction-details {
-  font-size: $uni-font-size-base;
   color: #666;
 }
 
@@ -1355,7 +1088,8 @@ page {
 
 .wallet-card {
   background: linear-gradient(to right, #000000 0%, #f85634 100%);
-  border-radius: 10px;
+  color: $uni-text-color-card;
+  border-radius: $uni-border-radius-lg;
   padding: 15px;
   margin-bottom: 20px;
 }
@@ -1367,19 +1101,30 @@ page {
 }
 
 .wallet-title, .wallet-network {
-  font-size: $font-size-sm;
-  color: #fff;
+}
+
+.wallet-container{
+  display: flex; 
+  align-items: center;
+}
+
+ // Start of Selection
+.wallet-address-container {
+  display: block; // Change to vertical view
+  align-items: flex-start; // Align items to the start
+  background-color: rgba(255, 255, 255, 0.2); // Translucent background
+  border-radius: $uni-border-radius-base; // Round border
+  padding: 10px; // Optional padding for better appearance
 }
 
 .wallet-balance {
   font-size: $font-size-xxl;
   font-weight: bold;
-  color: #fff;
   margin-bottom: 10px;
 }
 
 .wallet-address {
-  font-size: $font-size-xs;
+
   color: rgba(255, 255, 255, 0.7);
  
 }
@@ -1388,9 +1133,6 @@ page {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
   gap: 10px;
 }
 
@@ -1401,19 +1143,18 @@ page {
   cursor: pointer;
   width: 100%;
   border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.1); // Add a light border
-  
+  background-color: #ffffff;
+  ///border: 1px solid rgba(0, 0, 0, 0.1); // Add a light border
+  height: 40px;
   uni-icons {
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     border-radius: 50%;
-    padding: 10px;
-    margin-bottom: 5px;
-   
+    padding: 1px;
+    margin-bottom: 1px;
   }
   
   text {
     color: $text-color;
-    font-size: $font-size-xs;
   }
 }
 
@@ -1437,14 +1178,12 @@ page {
 }
 
 .instruction-title {
-  font-size: 16px;
   font-weight: bold;
   margin-left: 5px;
   color: #FF6B35;
 }
 
 .instruction-item {
-  font-size: 14px;
   color: #666;
   margin-bottom: 5px;
   padding-left: 25px;
@@ -1457,30 +1196,49 @@ page {
   }
 }
 
+.token-icon{
+  width: 40px;
+  height: 40px;
+}
 .asset-list {
   background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 20px;
 }
-
+ // Start of Selection
 .asset-item {
   display: flex;
-  align-items: center;
+  flex-direction: column; 
+  align-items: flex-start; 
+  background-color: $section-background-color;
+  border-radius: $uni-border-radius-lg;
   padding: 15px;
-  border-bottom: 1px solid $uni-border-color;
+  margin-bottom: 10px;
+}
 
-  &:last-child {
-    border-bottom: none;
-  }
+.asset-item-header {
+  display: flex;
+  align-items: left; 
+  justify-content: space-between; 
+  width: 100%;
+}
+
+.asset-item-details {
+  display: flex;
+  justify-content: space-around; /* Changed to space-around for even spacing */
+  padding-top: 15px;
+  padding-bottom: 10px;
+  width: 100%;
 }
 
 .asset-name {
-  font-size: $font-size-base;
   font-weight: bold;
   color: $text-color;
   margin-left: 10px;
   flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .asset-details {
@@ -1496,13 +1254,11 @@ page {
 }
 
 .asset-label {
-  font-size: $font-size-xs;
   color: $light-text-color;
   margin-right: 5px;
 }
 
 .asset-value {
-  font-size: $font-size-sm;
   color: $text-color;
 }
 
@@ -1520,7 +1276,6 @@ page {
 }
 
 .action-text {
-  font-size: $font-size-base;
   color: $text-color;
 }
 
@@ -1538,42 +1293,20 @@ page {
   border-radius: 15rpx;
   overflow: hidden;
   font-weight: bold;
-  padding: 5rpx;
+  padding: 4rpx;
   width: 100%;
   text {
     flex: 1;
     text-align: center;
     padding: 0.50rem 0; // 10px
+    color: $uni-text-color-card;
     
     &.active {
       background-color: $uni-color-primary;
-      color: #fff;
+      color: $uni-text-color-card-inverse;
       border-radius: 15rpx;
     }
   }
-}
-
-.order-select-content {
-  background-color: #fff;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 20px;
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.order-select-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.order-select-title {
-  font-size: 18px;
-  font-weight: bold;
 }
 
 .order-list {
@@ -1678,6 +1411,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 5px;
 }
 
 .refresh-icon {

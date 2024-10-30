@@ -25,13 +25,13 @@
         <text>余额: {{ availableBalance }} {{ selectedOrderType === 'BUY' ? 'USDT' : 'SEE' }}</text>
       </view>
       <view class="input-group">
-        <text>价格</text>
-        <input type="number" v-model="price" placeholder="USDT" />
+        <text>单价</text>
+        <input type="number" v-model="price" placeholder="USDT" @blur="validatePrice" />
       </view>
       <view class="input-group">
         <text>数量</text>
         <view class="input-wrapper">
-          <input type="number" v-model="amount" placeholder="SEE" @blur="onAmountInput" />
+          <input type="number" v-model="amount" placeholder="SEE" @blur="validateAmount" />
           <button class="btn-max" @click="setMaxAmount">最大</button>
         </view>
       </view>
@@ -56,10 +56,10 @@
     <view class="otc-order-book">
       <view class="otc-order-book-header">
         <view class="buy-header">
-          <text>买入(BID)</text>
+          <text>买</text>
         </view>
         <view class="sell-header">
-          <text>卖出(ASK)</text>
+          <text>卖</text>
         </view>
       </view>
       <view class="otc-order-book-content">
@@ -142,24 +142,28 @@
     <!-- Replace the custom confirmation popup with uni-popup -->
     <uni-popup ref="confirmPopup" type="center">
       <view class="popup-content">
-        <view class="confirmation-title">{{ confirmationTitle }}</view>
+        <view class="confirmation-title">{{ amount }} {{ orderCurrency }}</view>
         <text class="confirmation-subtitle">您确认{{ orderType }}{{ amount }} {{ orderCurrency }}吗</text>
         <view class="confirmation-details">
           <view class="detail-item">
-            <text>单价</text>
+            <text>订单信息</text>
+            
+          </view>
+          <view class="detail-item">
+            <text style="color: #999;">单价</text>
             <text>{{ parseFloat(price).toFixed(4).padEnd(4, '0') }} {{ priceCurrency }}</text>
           </view>
           <view class="detail-item">
-            <text>实际支付</text>
+            <text style="color: #999;">实际支付</text>
             <text v-if="selectedOrderType === 'BUY'">{{ parseFloat(totalPrice).toFixed(4).padEnd(4, '0') }} {{ priceCurrency }}</text>
             <text v-else>{{ parseFloat(amount).toFixed(4).padEnd(4, '0') }} {{ orderCurrency }}</text>
           </view>
           <view class="detail-item">
-            <text>手续费</text>
+            <text style="color: #999;">手续费</text>
             <text>{{ parseFloat(fee).toFixed(4).padEnd(4, '0') }} {{ feeCurrency }}</text>
           </view>
           <view class="detail-item">
-            <text>实际到账 ({{ receivedCurrency }})</text>
+            <text style="color: #999;">实际到账 ({{ receivedCurrency }})</text>
             <text>{{ parseFloat(actualAmount).toFixed(4).padEnd(4, '0') }} {{ receivedCurrency }}</text>
           </view>
         </view>
@@ -181,7 +185,8 @@
           />
         </view>
         <text class="result-title">{{ transactionSuccess ? '交易成功' : '交易失败' }}</text>
-        <text class="result-message">{{ resultMessage }}</text>
+        <text class="result-message"></text>
+        <text class="result-submessage">您可在我的订单中进行查看</text>
         <button class="uni-btn" @click="closeResultPopup">确定</button>
       </view>
     </uni-popup>
@@ -260,6 +265,8 @@ export default {
       rawOrders: [],
       selectedOrderIds: [],
       customQty: '', // Add this for the initial quantity input
+      priceError: '',
+      amountError: '',
     };
   },
   computed: {
@@ -354,6 +361,15 @@ export default {
       }
     },
     showConfirmation(type) {
+      this.validatePrice();
+      this.validateAmount();
+      if (this.priceError || this.amountError) {
+        uni.showToast({
+          title: '请修正错误后再提交',
+          icon: 'none'
+        });
+        return;
+      }
       this.orderType = type === 'BUY' ? '买入' : '卖出';
       this.$refs.confirmPopup.open();
     },
@@ -613,7 +629,29 @@ export default {
         this.$refs.resultPopup.open();
         this.customQty = '';
       }
-    }
+    },
+    validatePrice() {
+      if (!this.price || parseFloat(this.price) <= 0) {
+        this.priceError = '请输入有效的单价';
+        uni.showToast({
+          title: this.priceError,
+          icon: 'none'
+        });
+      } else {
+        this.priceError = '';
+      }
+    },
+    validateAmount() {
+      if (!this.amount || parseFloat(this.amount) <= 0) {
+        this.amountError = '请输入有效的数量';
+        uni.showToast({
+          title: this.amountError,
+          icon: 'none'
+        });
+      } else {
+        this.amountError = '';
+      }
+    },
   },
   mounted() {
     this.fetchOrderBook();

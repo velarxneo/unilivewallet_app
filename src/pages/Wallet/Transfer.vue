@@ -9,39 +9,47 @@
 
     <view class="section">
       <view class="input-group">
-        <text>数量</text>
         <view class="input-wrapper">
+        <text>划转至OTC</text>
+        <picker :range="availableTokens" @change="onTokenChange" class="picker">
+          <view class="picker">
+              {{ selectedToken }}
+              <uni-icons type="right" size="12" style="margin-top: 15px;"></uni-icons>
+            </view>
+          </picker>
+        </view>
+        <view class="input-wrapper" style="position: relative;">
           <input 
             type="number" 
             v-model="amount" 
             :placeholder="`输入${selectedToken}数量`" 
           />
-          <picker :range="availableTokens" @change="onTokenChange" class="token-picker">
-            <view class="picker">
-              {{ selectedToken }}
-              <uni-icons type="bottom" size="12"></uni-icons>
-            </view>
-          </picker>
+          <text class="all-button" @click="setMaxAmount" style="position: absolute; right: 10px; top: 10px; z-index: 20;">全部</text>
         </view>
         
       </view>
       <view class="balance">
         <text>可划数量：{{ maxAmount }} {{ selectedToken }}</text>
-        <text class="all-button" @click="setMaxAmount">全部</text>
+       
       </view>
       <view class="balance">
         <text>OTC数量：{{ otcBalance }} {{ selectedToken }}</text>
     
       </view>
     </view>
-    <view class="section">
-      <view class="transfer-notice">
-        <uni-icons type="info" size="16" color="#FF6B35"></uni-icons>
-        <text class="notice-text">温馨提示</text>
+    <view class="instructions">
+      <view class="instruction-header">
+        <uni-icons type="info" size="20" color="#FF6B35"></uni-icons>
+        <text class="instruction-title">温馨提示</text>
       </view>
     
-      <view class="notice-content">
-        <text>划转到OTC账户的资产仅用于场外交易</text>
+      <view class="info">
+        <text>划转手续费率：5%-8%</text>
+        <text>划转时需1:1匹配提现额度</text>
+        <text>划转额度获取方式：直播打赏明星主播</text>
+        <text>获取提现额度比例例： (1:1.6):20</text>
+        <text>例如：划转比例1:20时，划转1000个SEE，需打赏给明星主播50个SEE</text>
+        <text>划转成功后可在OTC查看SEE余额</text>
       </view>
     </view>
     <view class="section">
@@ -124,6 +132,7 @@
         </view>
         <text class="result-title">{{ transferSuccess ? '划转成功' : '划转失败' }}</text>
         <text class="result-message">{{ resultMessage }}</text>
+        <text class="result-submessage">{{ transferSuccess ? `恭喜你！划转成功，可前往OTC查看 ${selectedToken}余额` : '' }}</text>
         <button class="uni-btn" @click="closeResult">确定</button>
       </view>
     </uni-popup>
@@ -244,13 +253,13 @@ export default {
       try {
         const result = await transferBalance(this.userId, this.selectedToken, parseFloat(this.amount), true);
         this.transferSuccess = true;
-        this.resultMessage = `成功划转 ${this.amount - this.fee} ${this.selectedToken} 到 OTC 账户`;
+        this.resultMessage = `${this.amount} ${this.selectedToken}`;
         this.$refs.resultPopup.open();
         await this.handleTransferSuccess(); // Add this line
         this.amount = '';
       } catch (error) {
         this.transferSuccess = false;
-        this.resultMessage = error.message || '划转失败';
+        this.resultMessage = '';
         this.$refs.resultPopup.open();
       }
     },
@@ -282,7 +291,7 @@ export default {
     getTotalAmount() {
       const amount = parseFloat(this.amount) || 0;
       const fee = parseFloat(this.fee) || 0;
-      return (amount + fee).toFixed(4);
+      return (amount - fee).toFixed(4);
     },
 
     async fetchTransferHistory() {

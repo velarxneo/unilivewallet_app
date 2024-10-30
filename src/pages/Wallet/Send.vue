@@ -4,36 +4,38 @@
       <button class="back-button" @click="goBack"><uni-icons type="back" size="25"></uni-icons></button>
       <text class="uni-title">转账</text>
     </view>
-    
+
     <view class="send-type-header">
       <view class="send-type-selector">
         <text :class="{ active: sendType === 'address' }" @click="sendType = 'address'">钱包地址</text>
-        <text :class="{ active: sendType === 'userId' }" @click="sendType = 'userId'">用户PID</text>
+        <text :class="{ active: sendType === 'userId' }" @click="sendType = 'userId'">用户ID</text>
       </view>
     </view>
     <view class="section">
       <view class="input-group">
         <text class="input-label">{{ sendType === 'address' ? '接收地址' : '接收用户ID' }}</text>
-        <input type="text" v-model="recipient"
-          :placeholder="sendType === 'address' ? '请输入或长按粘贴转账地址' : '请输入接收用户ID'" />
+        <input type="text" v-model="recipient" :placeholder="sendType === 'address' ? '请输入或长按粘贴转账地址' : '请输入接收用户ID'" />
       </view>
 
       <view class="input-group">
-        <text class="input-label">代币数量</text>
         <view class="input-wrapper">
-          <input type="number" v-model="amount" placeholder="0.00" />
+          <text class="input-label">代币数量</text>
           <picker :range="tokenOptions" @change="onTokenChange">
             <view class="picker">
               {{ selectedToken }}
-              <uni-icons type="bottom" size="12"></uni-icons>
+              <uni-icons type="right" size="12" style="margin-top: 15px;"></uni-icons>
             </view>
           </picker>
+        </view>
+        <view class="input-wrapper" style="position: relative;">
+          <input type="number" v-model="amount" placeholder="0.00" />
+          <text class="all-button" @click="setMaxAmount" style="position: absolute; right: 10px; top: 10px; z-index: 10;">全部</text>
         </view>
       </view>
 
       <view class="balance">
         <text>可转数量：{{ availableBalance }} {{ selectedToken }}</text>
-        <text class="all-button" @click="setMaxAmount">全部</text>
+        
       </view>
     </view>
 
@@ -43,11 +45,12 @@
         <text class="instruction-title">转账说明</text>
       </view>
       <view class="info">
-        <text>转账地址与接收地址一致</text>
-        <text>请确保与接收方核对</text>
-        <text>当前可用余额不足时，无法发起转账</text>
-        <text>交易所充值地址请勿转入非交易所</text>
-        <text>支持的代币，否则资产将不可找回</text>
+        <text>复制钱包地址进行充值</text>
+        <text>请选择与提币平台一致的网络</text>
+        <text>当您充值该币种时，仅限于通过以下钱包支持的网络充值</text>
+        <text>通过其他网络充值造成的资金丢失，如网络错误等，资金无法找回</text>
+        <text>仅支持币安智能链（BSC/BEP20）</text>
+        <text>转账USDT需要扣除1%的手续费</text>
       </view>
     </view>
 
@@ -108,14 +111,11 @@
     <uni-popup ref="resultPopup" type="center" :animation="true">
       <view class="popup-content">
         <view class="result-icon">
-          <uni-icons 
-            :type="transferSuccess ? 'checkmarkempty' : 'closeempty'" 
-            size="50" 
-            :color="transferSuccess ? '#4CD964' : '#FF3B30'"
-          />
+          <uni-icons type="checkmarkempty" size="50" color="#FF6B35" />
         </view>
-        <text class="result-title">{{ transferSuccess ? '转账成功' : '转账失败' }}</text>
-        <text class="result-message">{{ resultMessage }}</text>
+        <text class="result-title">交易成功</text>
+        <text class="result-message">{{ amount }} {{ selectedToken }}</text>
+        <text class="result-submessage">恭喜你！转账成功，可前往钱包明细查看记录</text>
         <button class="uni-btn" @click="closeResult">确定</button>
       </view>
     </uni-popup>
@@ -193,7 +193,7 @@ export default {
         if (this.sendType === 'address') {
           const result = await isInternalAddress(this.recipient);
           this.isInternalTransfer = result.isInternal;
-          
+
           if (result.isInternal) {
             const feeData = await fetchTransferFee(this.selectedToken, this.amount);
             this.transferFee = feeData.totalFee;
@@ -204,7 +204,7 @@ export default {
               getEstimatedGasFee(this.recipient, this.selectedToken, parseFloat(this.amount)),
               fetchTransferFee(this.selectedToken, this.amount)
             ]);
-            
+
             this.gasFee = gasFeeResult.estimatedGasFee;
             this.transferFee = transferFeeData.totalFee;
             this.totalFee = (parseFloat(this.gasFee) + parseFloat(this.transferFee)).toFixed(4);
@@ -229,11 +229,11 @@ export default {
     },
     async confirmTransfer() {
       if (this.isProcessing) return;
-      
+
       this.isProcessing = true;
       try {
         let result;
-        
+
         if (this.sendType === 'address' && !this.isInternalTransfer) {
           result = await withdrawBalance(
             this.userId,
@@ -291,10 +291,10 @@ export default {
     goBack() {
       uni.reLaunch({
         url: '/pages/Profile/Profile',
-        success: function() {
+        success: function () {
           console.log('Successfully relaunched Profile page');
         },
-        fail: function(err) {
+        fail: function (err) {
           console.error('Failed to relaunch Profile page:', err);
         }
       });
@@ -339,6 +339,7 @@ export default {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

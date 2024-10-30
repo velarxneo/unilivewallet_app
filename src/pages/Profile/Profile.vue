@@ -21,59 +21,71 @@
     <view class="wallet-card">
       <view class="wallet-header">
         <text class="wallet-title">钱包总资产 (USDT)</text>
-        <text class="wallet-network">网络: BSC/BEP20</text>
+        
       </view>
-      <view class="balance-container" style="display: flex; align-items: center;">
+      <view class="wallet-container">
         <text class="wallet-balance">{{ parseFloat(usdtWalletBalance).toFixed(4) }}</text>
-        <button class="refresh-button" @click="refreshBalance" style="margin-left: 10px;">
+        <button class="refresh-button" @click="refreshBalance">
           <image src="/static/refresh-icon.png" :class="{'rotating': isRefreshing}" class="refresh-icon"></image>
         </button>
       </view>
-      <view class="wallet-address-container" style="display: flex; align-items: center;">
-        <text class="wallet-address">钱包地址: {{ truncatedAddress }}</text>
-        <button class="copy-button" @click="copyAddress" style="margin-left: 10px;">
-          <image :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="copy-icon"></image>
-        </button>
+      <view class="wallet-address-container">
+        <text class="wallet-network">网络: BSC/BEP20</text>
+        <view class="wallet-container">
+          <text class="wallet-network">钱包地址: {{ truncatedAddress }}</text>
+          <button class="refresh-button" @click="copyAddress">
+            <image :src="isCopied ? '/static/check-icon.png' : '/static/copy-icon.png'" class="refresh-icon"></image>
+          </button>
+        </view> 
       </view>
     </view>
     
     <view class="quick-actions">
       <view class="action-item" @click="handleAction('send')">
-        <uni-icons type="redo-filled" size="24" color="#333"></uni-icons>
+        <uni-icons type="redo-filled"></uni-icons>
         <text>转账</text>
       </view>
       <view class="action-item" @click="handleAction('receive')">
-        <uni-icons type="download-filled" size="24" color="#333"></uni-icons>
+        <uni-icons type="download-filled"></uni-icons>
         <text>收款</text>
       </view>
       <view class="action-item" @click="handleAction('transfer')">
-        <uni-icons type="loop" size="24" color="#333"></uni-icons>
+        <uni-icons type="loop"></uni-icons>
         <text>划转</text>
       </view>
       <view class="action-item" @click="handleAction('convert')">
-        <uni-icons type="refresh" size="30"></uni-icons>
+        <uni-icons type="refresh"></uni-icons>
         <text>闪兑</text>
       </view>
     </view>
     
-    <view class="asset-list">
+    
       <view v-for="balance in balances" :key="balance.tokenSymbol" class="asset-item" @click="showTokenDetails(balance)">
-        <uni-icons :type="balance.tokenSymbol === 'USDT' ? 'wallet' : 'wallet'" :size="24" :color="balance.tokenSymbol === 'USDT' ? '#4CD964' : '#007AFF'"></uni-icons>
-        <text class="asset-name">{{ balance.tokenSymbol }}</text>
-        <view class="asset-details">
-          <view class="asset-row">
+        <view class="asset-item-header">
+          <view style="display: flex; align-items: left;">
+            <image :src="`/static/images/tokens/${balance.tokenSymbol}.png`" :alt="balance.tokenSymbol" class="token-icon" style="width: 40px; height: 40px;"></image>
+            <text class="asset-name">{{ balance.tokenSymbol }}</text>
+          </view>
+          <uni-icons type="right" size="16" color="#999" style="margin-left: 10px;"></uni-icons>
+        </view>
+     
+        <view class="asset-item-details">
+          <view class="asset-details">
             <text class="asset-label">冻结</text>
             <text class="asset-value">{{ parseFloat(balance.lockedWalletBalance).toFixed(4) }}</text>
           </view>
-          <view class="asset-row">
+          <view class="asset-details" style="flex: 1;">
             <text class="asset-label">可用</text>
             <text class="asset-value">{{ (parseFloat(balance.walletBalance) - parseFloat(balance.lockedWalletBalance)).toFixed(4) }}</text>
           </view>
+          <view class="asset-details" style="flex: 1;">
+            <template v-if="balance.tokenSymbol === 'SEE'">
+              <text class="asset-label">≈USDT</text>
+              <text class="asset-value">0.000</text>
+            </template>
+          </view>
         </view>
-        <uni-icons type="right" size="16" color="#999"></uni-icons>
       </view>
-    </view>
-    
     <!-- <view class="action-list">
       <view class="action-item" @click="navigateTo('/pages/OTCTrading/OTCHistory')">
         <text class="action-text">问题工单</text>

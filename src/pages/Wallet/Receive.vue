@@ -6,8 +6,10 @@
     </view>
     
     <view class="section">
-      <text>网络</text>
-      <text>BSC/BEP20</text>
+        <view class="input-wrapper">
+            <text>网络</text>
+            <text>BSC/BEP20</text>
+        </view>
     </view>
 
     <view class="section">
@@ -30,9 +32,11 @@
         <text class="instruction-title">收款说明</text>
       </view>
       <view class="info">
-        <text class="instruction-item">该地址仅支持BSC链上资产</text>
-        <text class="instruction-item">请使用与当前网络相符的钱包进行转账</text>
-        <text class="instruction-item">仅支持BSC/BEP20网络上的代币转账，其他网络的转账可能导致资产丢失</text>
+        <text class="instruction-item">复制钱包地址进行充值</text>
+        <text class="instruction-item">请选择与币种平台一致的网络</text>
+        <text class="instruction-item">当您充值该种时，仅限于通过下方钱包支持的网络充值</text>
+        <text class="instruction-item">通过其他网络充值造成的资金丢失，如网络错误等，资金无法找回</text>
+        <text class="instruction-item">仅支持币安智能链（BSC/BEP20）</text>
       </view>
     </view>
   </view>

@@ -8,15 +8,18 @@
     <view class="section">
         <view class="balance">
             <text>可兑：{{ maxAmount }} USDT</text>
-            <text class="all-button" @click="setMaxAmount">全部</text>
+           
         </view>
     </view>
 
     <view class="section">
-      <view class="input-group">
         <text>USDT数量</text>
-        <input type="number" v-model="fromAmount" @input="updateToAmount" placeholder="输入USDT数量" />
-      </view>
+        <view class="input-group">
+            <view class="input-wrapper" style="position: relative;">
+                <input type="number" v-model="fromAmount" @input="updateToAmount" placeholder="输入USDT数量" />
+                <text class="all-button" @click="setMaxAmount" style="position: absolute; right: 10px; top: 10px; z-index: 20;">全部</text>
+            </view>
+        </view>
 
       <view class="conversion-rate">
         <text>兑换率: 1 USDT = {{ conversionRate }} DOU</text>
@@ -111,6 +114,7 @@
         </view>
         <text class="result-title">{{ resultSuccess ? '兑换成功' : '兑换失败' }}</text>
         <text class="result-message">{{ resultMessage }}</text>
+        <text class="result-submessage">恭喜你！兑换成功，可前往钱包明细查看记录</text>
         <button class="uni-btn" @click="closeResult">确定</button>
       </view>
     </uni-popup>

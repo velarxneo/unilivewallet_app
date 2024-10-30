@@ -5,14 +5,12 @@
       <text class="uni-title">{{ tokenSymbol }}</text>
     </view>
 
-    <view class="wallet-card">
-      <view class="wallet-header">
+    <view class="wallet-card" style="display: flex; flex-direction: column; align-items: center;">
+      
         <text class="wallet-title">{{ tokenSymbol }}</text>
-        <text class="wallet-network">网络: BSC/BEP20</text>
-      </view>
+
       <text class="wallet-balance">{{ tokenBalance }}</text>
     </view>
-    
     <view v-for="(transaction, index) in transactions" :key="index">
       <!-- Deposit transaction -->
       <view v-if="transaction.transactionCode.code === 'DEP'" class="section-column" @click="showTransactionDetails(transaction)">

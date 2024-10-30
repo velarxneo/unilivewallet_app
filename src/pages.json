@@ -1,7 +1,7 @@
 {
 	"pages": [
 		{
-			"path": "pages/index/index",
+			"path": "pages/admin/Login",
 			"style": {
 				"navigationBarTitleText": "UniLive Wallet"
 			}
@@ -87,6 +87,43 @@
 				"navigationBarTitleText": "划转",
 				"navigationStyle": "custom"
 			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "pages/admin",
+			"pages": [
+				{
+					"path": "Login",
+					"style": {
+						"navigationBarTitleText": "Admin Login"
+					}
+				},
+				{
+					"path": "Dashboard",
+					"style": {
+						"navigationBarTitleText": "Admin Dashboard"
+					}
+				},
+				{
+					"path": "ConversionRates",
+					"style": {
+						"navigationBarTitleText": "Manage Conversion Rates"
+					}
+				},
+				{
+					"path": "FeeConfiguration",
+					"style": {
+						"navigationBarTitleText": "Manage Fees"
+					}
+				},
+				{
+					"path": "Tokens",
+					"style": {
+						"navigationBarTitleText": "Manage Tokens"
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {
