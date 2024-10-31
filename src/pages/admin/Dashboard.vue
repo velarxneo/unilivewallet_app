@@ -3,13 +3,13 @@
     <uni-card>
       <view class="admin-menu">
         <button class="uni-btn" @click="navigateTo('/pages/admin/ConversionRates')">
-          Manage Conversion Rates
+          管理汇率
         </button>
         <button class="uni-btn" @click="navigateTo('/pages/admin/FeeConfiguration')">
-          Manage Fees
+          管理费用
         </button>
         <button class="uni-btn" @click="navigateTo('/pages/admin/Tokens')">
-          Manage Tokens
+          管理代币
         </button>
       </view>
     </uni-card>
@@ -32,8 +32,8 @@ export default {
 </script>
 
 <style>
-.container{
-    padding: 20px;
+.container {
+  padding: 20px;
 }
 .admin-menu {
   display: flex;
