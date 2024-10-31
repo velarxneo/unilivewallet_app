@@ -410,6 +410,23 @@ page {
   }
 
 }
+.login-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f8f8;
+}
+
+.login-box {
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 // Login Popup Styles
 .login-popup {
@@ -557,6 +574,28 @@ page {
   border-radius: $uni-border-radius-lg;
   padding: 5px 30px;
   cursor: pointer;
+}
+
+.edit-btn, 
+.delete-btn,
+.add-btn {
+  border-radius: $uni-border-radius-lg;
+  margin: 10px;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #4CD964;
+}
+
+.delete-btn {
+  background-color: #FF3B30;
+}
+
+.add-btn {
+  
+  background-color: #007AFF;
+
 }
 
 .result-submessage {

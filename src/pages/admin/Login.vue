@@ -18,7 +18,7 @@
           type="password"
         />
       </view>
-      <button class="login-btn" @click="handleLogin">Login</button>
+      <button class="uni-btn" @click="handleLogin">Login</button>
     </view>
   </view>
 </template>
@@ -34,83 +34,62 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const response = await uni.request({
+        const [error, response] = await uni.request({
           url: `${this.$apiBaseUrl}/api/admin/auth/login`,
           method: 'POST',
+          header: {
+            'Content-Type': 'application/json'
+          },
           data: {
             userId: this.userId,
             password: this.password
           }
         });
-        
-        if (response.data.token) {
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('Login response:', response);
+
+        if (response.statusCode === 200 && response.data.token) {
           uni.setStorageSync('admin_token', response.data.token);
-          uni.navigateTo({
-            url: '/pages/admin/Dashboard'
+
+          uni.showToast({
+            title: '登录成功',
+            icon: 'success',
+            duration: 2000
+          });
+
+          setTimeout(() => {
+            uni.reLaunch({
+              url: '/pages/admin/Dashboard',
+              success: function() {
+                console.log('Successfully navigated to Dashboard');
+              },
+              fail: function(err) {
+                console.error('Failed to navigate:', err);
+              }
+            });
+          }, 2000);
+        } else {
+          const errorMessage = response.data?.message || 
+                             (response.statusCode === 401 ? '用户名或密码错误' : '登录失败');
+          uni.showToast({
+            title: errorMessage,
+            icon: 'none',
+            duration: 2000
           });
         }
       } catch (error) {
+        console.error('Login error:', error);
         uni.showToast({
-          title: 'Login failed',
-          icon: 'none'
+          title: '网络错误，请稍后重试',
+          icon: 'none',
+          duration: 2000
         });
       }
     }
   }
 }
 </script>
-
-<style>
-.login-container {
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f8f8f8;
-}
-
-.login-box {
-  width: 90%;
-  max-width: 400px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.title {
-  font-size: 32rpx;
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.input-group {
-  margin-bottom: 15px;
-}
-
-.input {
-  width: 100%;
-  height: 40px;
-  padding: 0 15px;
-  border: 1px solid #e5e5e5;
-  border-radius: 6rpx;
-  font-size: 28rpx;
-}
-
-.login-btn {
-  width: 100%;
-  height: 40px;
-  background-color: #ff6b35;
-  color: #fff;
-  border: none;
-  border-radius: 6rpx;
-  font-size: 28rpx;
-  margin-top: 20px;
-}
-
-.login-btn:active {
-  opacity: 0.8;
-}
-</style> 

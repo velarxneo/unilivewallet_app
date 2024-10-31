@@ -1,17 +1,16 @@
 <template>
-  <view class="order-select-wrapper">
+  <view class="order-select-wrapper" style="background-color: #ffffff; padding: 20px; border-radius: 10px;">
     <uni-popup ref="orderSelectPopup" type="bottom">
-      <view class="order-select-content">
-        <view class="order-select-header">
-          <view class="order-select-title">
-            <text>选择{{ orderType === 'BUY' ? '买入' : '卖出' }}订单</text>
-          </view>
-          <view class="target-qty">
-            <text>目标数量: {{ parseFloat(targetQty).toFixed(4) }} SEE</text>
+      <view class="order-select-content" style="background-color: #ffffff; padding: 15px;">
+        <view class="order-select-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <view class="order-select-title" style="font-size: 18px; font-weight: bold;">
+            <text>选择{{ orderType === 'BUY' ?  '卖出' : '买入' }}订单</text>
           </view>
           <uni-icons type="closeempty" size="24" color="#333" @click="close"></uni-icons>
         </view>
-
+        <view class="target-qty">
+            <text>目标数量: {{ parseFloat(targetQty).toFixed(4) }} SEE</text>
+        </view>
         <view class="order-list">
           <view class="order-header">
             <view class="order-header-left">
@@ -115,7 +114,7 @@ export default {
   },
   computed: {
     filteredOrders() {
-      return this.rawOrders.filter(o => o.orderType === this.orderType);
+      return this.rawOrders.filter(o => o.orderType === (this.orderType === 'BUY' ? 'SELL' : 'BUY'));
     },
     selectedTotal() {
       return this.selectedOrderIds.reduce((sum, id) => {
