@@ -910,11 +910,10 @@ page {
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 15px;
 }
 
 .history-title {
-  color: $uni-color-primary;
+  margin-top: 20px;
   font-weight: bold;
 }
 
@@ -922,18 +921,16 @@ page {
   display: flex;
   flex-direction: column;
   padding: 10px 0;
-  border-bottom: 1px solid $uni-border-color;
-
-  &:last-child {
-    border-bottom: none;
-  }
 }
 
 .history-item-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  padding-bottom: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid $uni-border-color; // Added bottom border
 }
 
 .transaction-item {
@@ -959,7 +956,20 @@ page {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
+
+  text:first-child {
+    color: #999; // Set the first item in each row to gray
+  }
 }
+
+.order-details{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid $uni-border-color;
+}
+
 
 .status {
   &.in-progress {
@@ -1196,10 +1206,21 @@ page {
   }
 }
 
-.token-icon{
-  width: 40px;
-  height: 40px;
+.token-wrapper{
+  display: flex;
+  align-items: center;
 }
+
+.token-icon{
+  width: 30px;
+  height: 30px;
+}
+
+ // Start of Selection
+.token-text {
+  margin-left: 10px;
+}
+
 .asset-list {
   background-color: #fff;
   border-radius: 10px;

@@ -14,11 +14,14 @@
       <text :class="{ active: selectedStatus === 'FILLED' }" @click="selectStatus('FILLED')">已完成</text>
       <text :class="{ active: selectedStatus === 'CANCELLED' }" @click="selectStatus('CANCELLED')">已取消</text>
     </view>
-    <view class="section" @scroll="handleScroll">
-      <view v-for="(order, index) in filteredOrders" :key="index" class="history-item">
+    <view>
+      <view v-for="(order, index) in filteredOrders" :key="index" class="section">
         <view class="history-item-main">
           <text>{{ order.orderType === 'BUY' ? '买入' : '卖出' }}</text>
-          <text>SEE: {{ order.qty ? order.qty.toFixed(4).padEnd(4, '0') : '0.0000' }}</text>
+          <view class="token-wrapper">
+            <img :src="`/static/images/tokens/${order.baseTokenSymbolImageUrl}`" alt="Token Image" class="token-icon" />
+            <text class="token-text">SEE: {{ order.qty ? order.qty.toFixed(4).padEnd(4, '0') : '0.0000' }}</text>
+          </view>
         </view>
         <view class="order-details">
           <view class="detail-row">
@@ -58,7 +61,7 @@
     </view>
 
     <!-- Cancel Confirmation Popup -->
-    <view v-if="showCancelConfirmationPopup" class="confirmation-popup">
+    <uni-popup ref="cancelPopup" type="dialog">
       <view class="popup-content">
         <text class="confirmation-title">确认取消订单</text>
         <text class="confirmation-subtitle">您确认要取消这个订单吗？</text>
@@ -85,26 +88,31 @@
           <button class="btn-confirm" @click="confirmCancelOrder">确定</button>
         </view>
       </view>
-    </view>
+    </uni-popup>
 
     <!-- Result Popup -->
-    <ResultPopup 
-      :show="showResultPopup"
-      :success="cancelSuccess"
-      :message="resultMessage"
-      @close="closeResultPopup"
-    />
+    <uni-popup ref="resultPopup" type="center">
+      <view class="popup-content">
+        <view class="result-icon">
+          <uni-icons 
+            :type="cancelSuccess ? 'checkmarkempty' : 'closeempty'" 
+            size="50" 
+            :color="cancelSuccess ? '#4CD964' : '#FF3B30'"
+          />
+        </view>
+        <text class="result-title">{{ cancelSuccess ? '交易成功' : '交易失败' }}</text>
+        <text class="result-message"></text>
+        <text class="result-submessage">您的订单取消{{ cancelSuccess ? '成功' : '失败' }}</text>
+        <button class="uni-btn" @click="closeResultPopup">确定</button>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script>
 import { fetchOrderHistory, cancelOrder } from '@/services/otcService';
-import ResultPopup from '@/components/ResultPopup.vue';
 
 export default {
-  components: {
-    ResultPopup
-  },
   data() {
     return {
       selectedTab: 'BUY',
@@ -124,6 +132,12 @@ export default {
       orderToCancel: null,
     };
   },
+  onReachBottom() {
+    console.log('Reached bottom');
+    if (!this.loading && this.hasMore) {
+      this.fetchOrderHistory();
+    }
+  },
   methods: {
     async fetchOrderHistory() {
       if (this.loading || !this.hasMore) return;
@@ -137,15 +151,28 @@ export default {
       }
 
       try {
+        console.log('Fetching page:', this.currentPage);
         const data = await fetchOrderHistory(userId, this.currentPage, this.pageSize, this.selectedTab, this.selectedStatus);
-        if (data.content.length < this.pageSize) {
-          this.hasMore = false;
+        console.log('Fetched Order History:', data);
+        
+        if (data.content) {
+          if (data.content.length === 0) {
+            this.hasMore = false;
+          } else {
+            this.orders = [...this.orders, ...data.content];
+            this.filterOrders();
+            this.hasMore = !data.last;
+            if (!data.last) {
+              this.currentPage++;
+            }
+          }
         }
-        this.orders = [...this.orders, ...data.content];
-        this.filterOrders();
-        this.currentPage++;
       } catch (error) {
         console.error('Error fetching order history:', error);
+        uni.showToast({
+          title: '加载失败',
+          icon: 'none'
+        });
       } finally {
         this.loading = false;
       }
@@ -172,12 +199,6 @@ export default {
       this.currentPage = 0;
       this.hasMore = true;
       this.orders = [];
-    },
-    handleScroll(event) {
-      const { scrollTop, scrollHeight, clientHeight } = event.target;
-      if (scrollTop + clientHeight >= scrollHeight - 10) {
-        this.fetchOrderHistory();
-      }
     },
     goBack() {
       console.log('Attempting to navigate back');
@@ -216,34 +237,30 @@ export default {
     },
     showCancelConfirmation(order) {
       this.orderToCancel = order;
-      this.showCancelConfirmationPopup = true;
+      this.$refs.cancelPopup.open();
     },
-
     cancelCancelConfirmation() {
-      this.showCancelConfirmationPopup = false;
+      this.$refs.cancelPopup.close();
       this.orderToCancel = null;
     },
-
     async confirmCancelOrder() {
-      this.showCancelConfirmationPopup = false;
+      this.$refs.cancelPopup.close();
       if (this.orderToCancel) {
         try {
-          const response = await cancelOrder(this.orderToCancel.id);
+          await cancelOrder(this.orderToCancel.id);
           this.cancelSuccess = true;
           this.resultMessage = '订单已成功取消';
-          // Refresh the order list
           this.resetPagination();
           this.fetchOrderHistory();
         } catch (error) {
           this.cancelSuccess = false;
           this.resultMessage = '取消订单失败: ' + error.message;
         }
-        this.showResultPopup = true;
+        this.$refs.resultPopup.open();
       }
     },
-
     closeResultPopup() {
-      this.showResultPopup = false;
+      this.$refs.resultPopup.close();
       this.orderToCancel = null;
     },
 

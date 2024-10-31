@@ -26,14 +26,19 @@
       </view>
       <view class="input-group">
         <text>单价</text>
-        <input type="number" v-model="price" placeholder="USDT" @blur="validatePrice" />
+        <div class="input-wrapper" style="position: relative;">
+          <input type="number" v-model="price" placeholder="USDT" @blur="validatePrice" />
+          <img src="/static/images/tokens/USDT.png" alt="USDT Logo" class="token-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" />
+        </div>
       </view>
       <view class="input-group">
         <text>数量</text>
-        <view class="input-wrapper">
-          <input type="number" v-model="amount" placeholder="SEE" @blur="validateAmount" />
-          <button class="btn-max" @click="setMaxAmount">最大</button>
+        <view class="input-wrapper" style="position: relative;">
+          <input type="number" v-model="amount" placeholder="SEE" @blur="validateAmount" style="padding-right: 40px;" />
+          <img src="/static/images/tokens/SEE.png" alt="SEE Logo" class="token-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;" />
+          <!-- <button class="btn-max" @click="setMaxAmount">最大</button> -->
         </view>
+        
       </view>
       <view class="otc-slider-group">
         <slider 
@@ -99,43 +104,53 @@
     </view>
 
     <!-- Transaction History Section -->
-    <view class="transaction-history">
-      <text class="history-title">最新成交记录</text>
-      <view v-for="(transaction, index) in transactionHistory" :key="'transaction-' + index" class="transaction-item">
-        <view class="transaction-header">
-          <text>{{ transaction.orderType === 'BUY' ? '买入' : '卖出' }}</text>
-          <text>SEE: {{ transaction.qty.toFixed(0) }}</text>
+    <view class="transaction-history-container">
+      <view class="history-header">
+        <text class="history-title">最新成交记录</text>
+      </view>
+      
+      <view class="transaction-history">
+        <view v-for="(transaction, index) in transactionHistory" :key="'transaction-' + index" class="section">
+          <view class="history-item-main">
+            <text>{{ transaction.orderType === 'BUY' ? '买入' : '卖出' }}</text>
+            <view class="token-wrapper">
+              <img :src="`/static/images/tokens/${transaction.baseTokenImageUrl}`" alt="Token Image" class="token-icon" />
+              <text class="token-text">SEE: {{ transaction.qty.toFixed(0) }}</text>
+            </view>
+          </view>
+          <view class="order-details">
+            <view class="detail-row">
+              <text>交易时间</text>
+              <text>{{ new Date(transaction.transactionDate).toLocaleString() }}</text>
+            </view>
+            <view class="detail-row">
+              <text>状态</text>
+              <text :class="['status', {
+                'in-progress': transaction.transactionType === 'CREATE',
+                'cancelled': transaction.transactionType === 'CANCEL',
+                'completed': transaction.transactionType === 'FILL'
+              }]">
+                {{ transaction.transactionType === 'CREATE' ? '进行中' :
+                    transaction.transactionType === 'CANCEL' ? '已取消' :
+                    transaction.transactionType === 'FILL' ? '已完成' : '未知状态' }}
+              </text>
+            </view>
+            <view class="detail-row">
+              <text>挂单价格</text>
+              <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
+            </view>
+            <view class="detail-row">
+              <text>成交数量</text>
+              <text>{{ transaction.qty.toFixed(4).padEnd(4, '0') }}</text>
+            </view>
+            <view class="detail-row">
+              <text>成交价格</text>
+              <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
+            </view>
+          </view>
         </view>
-        <view class="transaction-details">
-          <view class="detail-row">
-            <text>交易时间</text>
-            <text>{{ new Date(transaction.transactionDate).toLocaleString() }}</text>
-          </view>
-          <view class="detail-row">
-            <text>状态</text>
-            <text :class="['status', {
-              'in-progress': transaction.transactionType === 'CREATE',
-              'cancelled': transaction.transactionType === 'CANCEL',
-              'completed': transaction.transactionType === 'FILL'
-            }]">
-              {{ transaction.transactionType === 'CREATE' ? '进行中' :
-                 transaction.transactionType === 'CANCEL' ? '已取消' :
-                 transaction.transactionType === 'FILL' ? '已完成' : '未知状态' }}
-            </text>
-          </view>
-          <view class="detail-row">
-            <text>挂单价格</text>
-            <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
-          </view>
-          <view class="detail-row">
-            <text>成交数量</text>
-            <text>{{ transaction.qty.toFixed(4).padEnd(4, '0') }}</text>
-          </view>
-          <view class="detail-row">
-            <text>成交价格</text>
-            <text>{{ transaction.price.toFixed(4).padEnd(4, '0') }}</text>
-          </view>
-        </view>
+        <view v-if="loading" class="loading-indicator">加载中...</view>
+        <view v-if="!hasMore && !loading" class="end-of-list">没有更多交易</view>
       </view>
     </view>
 
@@ -257,6 +272,10 @@ export default {
       resultMessage: '',
       sliderValue: 0,
       transactionHistory: [], // Add this line
+      currentPage: 0, // Track the current page for pagination
+      pageSize: 10, // Number of transactions per page
+      hasMore: true, // Flag to indicate if more transactions are available
+      loading: false, // Flag to indicate if a fetch request is in progress
       orderType: 'BUY', // Add this line
       customOrderType: 'BUY',
       customPrice: '',
@@ -320,19 +339,14 @@ export default {
       return 'USDT';
     },
     feeCurrency() {
-      return this.selectedOrderType === 'BUY' ? 'SEE' : 'USDT';
-    },
-    filteredOrders() {
-      return this.customOrderType === 'BUY' 
-        ? this.orderBook.asks
-        : this.orderBook.bids;
+      return this.selectedOrderType === 'BUY' ? 'USDT' : 'SEE';
     }
   },
   methods: {
     async fetchOrderBook() {
       try {
-        this.orderBook = await fetchOrderBook();
-        this.setBestPrice();
+        const data = await fetchOrderBook();
+        this.orderBook = data;
       } catch (error) {
         console.error('Error fetching order book:', error);
       }
@@ -482,17 +496,41 @@ export default {
       }
     },
     async fetchTransactionHistory() {
+      if (this.loading || !this.hasMore) return;
+
+      this.loading = true;
       const userId = localStorage.getItem('userId');
       if (!userId) {
         console.error('User ID not found');
+        this.loading = false;
         return;
       }
 
       try {
-        const data = await fetchTransactionHistory(userId);
-        this.transactionHistory = data.content;
+        console.log('Current Page:', this.currentPage, 'Page Size:', this.pageSize);
+        const data = await fetchTransactionHistory(userId, this.currentPage, this.pageSize);
+        console.log('Fetched transaction history data:', data);
+
+        if (data.content) {
+          // Append new items to existing list
+          this.transactionHistory = [...this.transactionHistory, ...data.content];
+          
+          // Check if we've reached the last page
+          this.hasMore = !data.last;
+          
+          // Increment page number for next fetch
+          if (!data.last) {
+            this.currentPage++;
+          }
+        }
       } catch (error) {
         console.error('Error fetching transaction history:', error);
+        uni.showToast({
+          title: 'Failed to fetch transaction history',
+          icon: 'none'
+        });
+      } finally {
+        this.loading = false;
       }
     },
     showCustomOrder(type) {
@@ -652,6 +690,12 @@ export default {
         this.amountError = '';
       }
     },
+    onReachBottom() {
+      console.log('Reached bottom');
+      if (!this.loading && this.hasMore) {
+        this.fetchTransactionHistory();
+      }
+    },
   },
   mounted() {
     this.fetchOrderBook();
@@ -665,4 +709,3 @@ export default {
   }
 };
 </script>
-

@@ -28,9 +28,9 @@ export async function fetchFeeConfiguration() {
   }
 }
 
-export async function fetchTransactionHistory(userId) {
+export async function fetchTransactionHistory(userId, currentPage = 0, pageSize = 10) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/otc/transactions/user?userId=${userId}&page=0&size=10&sort=transactionDate,desc`);
+    const response = await fetch(`${API_BASE_URL}/api/otc/transactions/user?userId=${userId}&page=${currentPage}&size=${pageSize}&sort=transactionDate,desc`);
     if (!response.ok) {
       throw new Error('Failed to fetch transaction history');
     }
