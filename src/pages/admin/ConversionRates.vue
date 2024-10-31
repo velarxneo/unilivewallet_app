@@ -1,35 +1,17 @@
 <template>
-  <view class="container">
-    <uni-card>
-      <button class="uni-btn" @click="showAddModal">Add New Rate</button>
-      
-      <uni-table>
-        <uni-tr>
-          <uni-th>From Token</uni-th>
-          <uni-th>To Token</uni-th>
-          <uni-th>Rate</uni-th>
-          <uni-th>Actions</uni-th>
-        </uni-tr>
-        <uni-tr v-for="rate in rates" :key="rate.id">
-          <uni-td>{{ rate.fromToken }}</uni-td>
-          <uni-td>{{ rate.toToken }}</uni-td>
-          <uni-td>{{ rate.rate }}</uni-td>
-          <uni-td>
-            <uni-icons type="edit" @click="editRate(rate)" />
-            <uni-icons type="trash" @click="deleteRate(rate.id)" />
-          </uni-td>
-        </uni-tr>
-      </uni-table>
-    </uni-card>
-    
-    <uni-popup ref="addModal" type="dialog">
-      <view class="popup-content">
-        <uni-easyinput v-model="form.fromToken" placeholder="From Token" />
-        <uni-easyinput v-model="form.toToken" placeholder="To Token" />
-        <uni-easyinput v-model="form.rate" placeholder="Rate" />
-        <button class="uni-btn" @click="saveRate">Save</button>
+  <view class="conversion-rates-container">
+    <view class="header">
+      <button @click="goBack" class="back-button">返回</button>
+      <text class="title">管理汇率</text>
+    </view>
+    <view class="conversion-rates-list">
+      <view v-for="rate in conversionRates" :key="rate.id" class="rate-item">
+        <text>{{ rate.fromCurrency }} to {{ rate.toCurrency }}: {{ rate.rate }}</text>
+        <button @click="editRate(rate)">编辑</button>
+        <button @click="deleteRate(rate.id)">删除</button>
       </view>
-    </uni-popup>
+    </view>
+    <button @click="addRate" class="add-button">添加汇率</button>
   </view>
 </template>
 
@@ -37,48 +19,74 @@
 export default {
   data() {
     return {
-      rates: [],
-      form: {
-        fromToken: '',
-        toToken: '',
-        rate: ''
-      }
+      conversionRates: [] // This will hold the list of conversion rates
     }
   },
   methods: {
-    async loadRates() {
-      const token = uni.getStorageSync('admin_token');
-      const response = await uni.request({
-        url: `${this.$apiBaseUrl}/api/admin/conversion-rates`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      this.rates = response.data;
+    goBack() {
+      uni.navigateBack();
     },
-    
-    showAddModal() {
-      this.$refs.addModal.open();
+    fetchConversionRates() {
+      // Fetch conversion rates from the server
+      // Example: this.conversionRates = await fetchConversionRatesFromServer();
     },
-    
-    async saveRate() {
-      const token = uni.getStorageSync('admin_token');
-      await uni.request({
-        url: `${this.$apiBaseUrl}/api/admin/conversion-rates`,
-        method: 'POST',
-        header: {
-          'Authorization': `Bearer ${token}`
-        },
-        data: this.form
-      });
-      
-      this.$refs.addModal.close();
-      this.loadRates();
+    addRate() {
+      // Logic to add a new conversion rate
+    },
+    editRate(rate) {
+      // Logic to edit an existing conversion rate
+    },
+    deleteRate(rateId) {
+      // Logic to delete a conversion rate
     }
   },
   mounted() {
-    this.loadRates();
+    this.fetchConversionRates();
   }
 }
-</script> 
+</script>
+
+<style>
+.conversion-rates-container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.conversion-rates-list {
+  margin-bottom: 20px;
+}
+
+.rate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style> 

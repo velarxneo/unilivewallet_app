@@ -1,9 +1,10 @@
 {
 	"pages": [
 		{
-			"path": "pages/admin/Login",
+			"path": "pages/Profile/Profile",
 			"style": {
-				"navigationBarTitleText": "UniLive Wallet"
+				"navigationBarTitleText": "Profile",
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -32,13 +33,7 @@
 				"navigationBarTitleText": "Mission"
 			}
 		},
-		{
-			"path": "pages/Profile/Profile",
-			"style": {
-				"navigationBarTitleText": "Profile",
-				"navigationStyle": "custom"
-			}
-		},
+		
 		{
 			"path": "pages/OTCTrading/TransactionDetails",
 			"style": {

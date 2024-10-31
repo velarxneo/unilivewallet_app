@@ -1,34 +1,39 @@
 <template>
   <view class="login-container">
     <view class="login-box">
-      <view class="title">Admin Login</view>
+      <view class="title">管理员登录</view>
       <view class="input-group">
         <input 
           class="input" 
           v-model="userId" 
-          placeholder="Admin User ID"
+          placeholder="管理员用户ID"
           type="text"
+          @keyup.enter="handleLogin"
         />
       </view>
       <view class="input-group">
         <input 
           class="input" 
           v-model="password" 
-          placeholder="Password"
+          placeholder="密码"
           type="password"
+          @keyup.enter="handleLogin"
         />
       </view>
-      <button class="uni-btn" @click="handleLogin">Login</button>
+      <button class="uni-btn" @click="handleLogin">登录</button>
+      <view v-if="errorMessage" class="error-message">{{ errorMessage }}</view>
     </view>
   </view>
 </template>
 
 <script>
 export default {
+  name: 'AdminLogin',
   data() {
     return {
       userId: '',
-      password: ''
+      password: '',
+      errorMessage: ''
     }
   },
   methods: {
@@ -65,31 +70,62 @@ export default {
             uni.reLaunch({
               url: '/pages/admin/Dashboard',
               success: function() {
-                console.log('Successfully navigated to Dashboard');
+                console.log('成功导航到仪表板');
               },
               fail: function(err) {
-                console.error('Failed to navigate:', err);
+                console.error('导航失败:', err);
               }
             });
           }, 2000);
         } else {
-          const errorMessage = response.data?.message || 
-                             (response.statusCode === 401 ? '用户名或密码错误' : '登录失败');
+          this.errorMessage = '登录失败';
           uni.showToast({
-            title: errorMessage,
+            title: this.errorMessage,
             icon: 'none',
             duration: 2000
           });
         }
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('登录错误:', error);
+        this.errorMessage = '网络错误，请稍后重试';
         uni.showToast({
-          title: '网络错误，请稍后重试',
+          title: this.errorMessage,
           icon: 'none',
           duration: 2000
         });
       }
     }
+  },
+  onLoad() {
+    console.log('管理员登录页面加载');
+    if (typeof window !== 'undefined' && window.document) {
+      // Hide bottom menu if it exists
+      const bottomMenu = document.querySelector('.bottom-menu');
+      if (bottomMenu) {
+        bottomMenu.style.display = 'none';
+      }
+    }
+  },
+  onUnload() {
+    if (typeof window !== 'undefined' && window.document) {
+      // Show bottom menu again when leaving the page
+      const bottomMenu = document.querySelector('.bottom-menu');
+      if (bottomMenu) {
+        bottomMenu.style.display = 'block';
+      }
+    }
   }
 }
 </script>
+
+<style>
+.login-container {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+</style>

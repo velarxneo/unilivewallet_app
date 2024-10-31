@@ -17,7 +17,12 @@
 </template>
 
 <script>
+import UniCard from '@dcloudio/uni-ui/lib/uni-card/uni-card.vue'; // Adjust the path as needed
+
 export default {
+  components: {
+    UniCard
+  },
   methods: {
     navigateTo(url) {
       uni.navigateTo({ url });
@@ -27,6 +32,9 @@ export default {
 </script>
 
 <style>
+.container{
+    padding: 20px;
+}
 .admin-menu {
   display: flex;
   flex-direction: column;
