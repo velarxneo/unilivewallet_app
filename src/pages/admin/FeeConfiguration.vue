@@ -1,9 +1,14 @@
 <template>
-  <view class="fee-configuration-container">
+  <view class="uni-container">
     <view class="header">
       <text class="title">管理手续费配置</text>
     </view>
-    <button class="uni-btn" @click="openPopup('add')">添加手续费配置</button>
+    <uni-card>
+      <view class="admin-menu">
+        <button class="uni-btn" @click="openPopup('add')">添加手续费配置</button>
+      </view>
+    </uni-card>
+    
     <view class="fee-configuration-list">
       <view class="table-header" style="display: flex; justify-content: space-between;">
         <text class="header-item" style="flex: 1;">交易代码</text>
@@ -20,8 +25,8 @@
         <text class="fee-item-text" style="flex: 1;">{{ fee.feeValue }}{{ fee.feeMethod === 'PERCENTAGE' ? '%' : '' }}</text>
         <text class="fee-item-text" style="flex: 1;">{{ getFeeMethodLabel(fee.feeMethod) }}</text>
         <view class="fee-item-actions" style="flex: 1; display: flex; justify-content: flex-end;">
-          <button @click="openPopup('edit', fee)">编辑</button>
-          <button @click="deleteFee(fee.id)">删除</button>
+          <button @click="openPopup('edit', fee)" style="white-space: nowrap;">编辑</button>
+          <button @click="deleteFee(fee.id)" style="white-space: nowrap;">删除</button>
         </view>
       </view>
     </view>
@@ -329,7 +334,7 @@ export default {
 
 .title {
   font-size: 24px;
-  font-weight: bold;
+  color: #ffffff;
 }
 
 .fee-configuration-list {
@@ -361,15 +366,6 @@ export default {
   gap: 10px;
 }
 
-.uni-btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .fee-method-select {
   width: 100%;
   padding: 8px;
@@ -377,26 +373,6 @@ export default {
   border-radius: 4px;
   background-color: white;
   font-size: 14px;
-}
-
-.input-group {
-  margin-bottom: 15px;
-}
-
-.input-group input,
-.input-group select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: #666;
 }
 
 /* Add these styles for better mobile display */

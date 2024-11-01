@@ -1,10 +1,14 @@
 <template>
-  <view class="conversion-rates-container">
+  <view class="uni-container">
     <view class="header">
       <text class="title">管理汇率</text>
-      
     </view>
-    <button class="uni-btn" @click="openPopup('add')">添加汇率</button>
+    <uni-card>
+      <view class="admin-menu">
+        <button class="uni-btn" @click="openPopup('add')">添加汇率</button>
+      </view>
+    </uni-card>
+    
     <view class="conversion-rates-list">
       <view class="table-header" style="display: flex; justify-content: space-between;">
         <text class="header-item" style="flex: 1;">源代币</text>
@@ -154,7 +158,7 @@ export default {
 
 .title {
   font-size: 24px;
-  font-weight: bold;
+  color: #ffffff;
 }
 
 .conversion-rates-list {
@@ -186,12 +190,4 @@ export default {
   gap: 10px;
 }
 
-.uni-btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
 </style> 

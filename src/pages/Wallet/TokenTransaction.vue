@@ -100,7 +100,7 @@
           <uni-icons type="loop" size="20" color="#fff"></uni-icons>
         </view>
         <view class="transaction-details">
-          <text class="transaction-address">内部转账</text>
+          <text class="transaction-address">{{ transaction.transactionCode.code === 'BAL_UNL' ? '解冻' : '内部转账' }}</text>
           <view class="transaction-date-container">
             <text class="transaction-date">{{ formatDate(transaction.timestamp) }}</text>
           </view>

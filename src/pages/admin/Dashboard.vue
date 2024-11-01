@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="uni-container">
     <uni-card>
       <view class="admin-menu">
         <button class="uni-btn" @click="navigateTo('/pages/admin/ConversionRates')">
