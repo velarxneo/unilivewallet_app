@@ -149,3 +149,17 @@ export async function fetchTransactionFee(token, qty) {
     throw error;
   }
 }
+
+export async function fetchCurrentPrice(baseTokenSymbol, quoteTokenSymbol) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/otc/transactions/price?baseTokenSymbol=${baseTokenSymbol}&quoteTokenSymbol=${quoteTokenSymbol}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch current price');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching current price:', error);
+    return 0;
+  }
+}

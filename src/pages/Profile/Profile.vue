@@ -81,7 +81,7 @@
           <view class="asset-details" style="flex: 1;">
             <template v-if="balance.tokenSymbol === 'SEE'">
               <text class="asset-label">≈USDT</text>
-              <text class="asset-value">0.000</text>
+              <text class="asset-value">{{ getTokenValueInUSDT('SEE', balance.walletBalance) }}</text>
             </template>
           </view>
         </view>
@@ -100,6 +100,7 @@
 <script>
 import BottomMenu from '@/components/BottomMenu.vue';
 import { fetchUserBalancesWithDetails, checkWalletDeposits } from '@/services/userService';
+import { fetchCurrentPrice } from '@/services/otcService';
 
 export default {
   name: 'Profile',
@@ -114,7 +115,8 @@ export default {
       usdtWalletBalance: '0',
       truncatedAddress: '',
       isCopied: false,
-      isRefreshing: false
+      isRefreshing: false,
+      seePrice: 0
     };
   },
   mounted() {
@@ -129,7 +131,6 @@ export default {
         const userId = localStorage.getItem('userId');
         if (!userId) {
           console.error('User ID not found in localStorage');
-          // Handle the case when user is not logged in
           return;
         }
         const userData = await fetchUserBalancesWithDetails(userId);
@@ -138,6 +139,8 @@ export default {
         this.balances = userData.balances;
         this.usdtWalletBalance = userData.usdtWalletBalance;
         this.truncatedAddress = this.truncateAddress(userData.address);
+        
+        await this.fetchSEEPrice();
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -294,6 +297,27 @@ export default {
       } finally {
         this.isRefreshing = false;
       }
+    },
+    async fetchSEEPrice() {
+      try {
+        const response = await fetchCurrentPrice('SEE', 'USDT');
+        this.seePrice = response.price; // Accessing the price property from the response
+        console.log('Fetched SEE price:', this.seePrice); // Debug log
+      } catch (error) {
+        console.error('Error fetching SEE price:', error);
+        this.seePrice = 0;
+      }
+    }
+  },
+  computed: {
+    getTokenValueInUSDT() {
+      return (tokenSymbol, balance) => {
+        if (tokenSymbol === 'SEE' && balance && this.seePrice) {
+          const value = parseFloat(balance) * this.seePrice;
+          return value.toFixed(4);
+        }
+        return '0.0000';
+      };
     }
   }
 };
