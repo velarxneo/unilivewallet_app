@@ -412,28 +412,32 @@ export default {
           expirationDate: oneYearFromNow.toISOString()
         };
 
-
         const result = await matchOrder(requestBody);
-
         
-        // Check if the API call was successful
         if (result) {
           this.transactionSuccess = true;
           this.resultMessage = '您可以在我的订单中查看';
-          // Refresh data only on success
-          await this.fetchOrderBook();
-          await this.fetchUserBalances();
-          await this.fetchTransactionHistory();
+          
+          // Reset the transaction history before fetching new data
+          this.transactionHistory = [];
+          this.currentPage = 0;
+          this.hasMore = true;
+          
+          // Refresh all data
+          await Promise.all([
+            this.fetchOrderBook(),
+            this.fetchUserBalances(),
+            this.fetchTransactionHistory()
+          ]);
+          
           // Reset form
           this.amount = '';
           this.price = '';
         } else {
-          // Handle API error response
           this.transactionSuccess = false;
           this.resultMessage = result?.message || '交易失败';
         }
       } catch (error) {
-        // Handle network or other errors
         console.error('Error in order matching:', error);
         this.transactionSuccess = false;
         this.resultMessage = error.message || '交易过程中发生错误，请稍后重试';
@@ -496,7 +500,7 @@ export default {
       }
     },
     async fetchTransactionHistory() {
-      if (this.loading || !this.hasMore) return;
+      if (this.loading) return;
 
       this.loading = true;
       const userId = localStorage.getItem('userId');
@@ -507,18 +511,20 @@ export default {
       }
 
       try {
-        console.log('Current Page:', this.currentPage, 'Page Size:', this.pageSize);
+        console.log('Fetching transaction history - Page:', this.currentPage);
         const data = await fetchTransactionHistory(userId, this.currentPage, this.pageSize);
-        console.log('Fetched transaction history data:', data);
+        console.log('Received transaction history:', data);
 
         if (data.content) {
-          // Append new items to existing list
-          this.transactionHistory = [...this.transactionHistory, ...data.content];
+          if (this.currentPage === 0) {
+            // If it's the first page, replace the entire list
+            this.transactionHistory = data.content;
+          } else {
+            // Otherwise append to the existing list
+            this.transactionHistory = [...this.transactionHistory, ...data.content];
+          }
           
-          // Check if we've reached the last page
           this.hasMore = !data.last;
-          
-          // Increment page number for next fetch
           if (!data.last) {
             this.currentPage++;
           }
@@ -526,7 +532,7 @@ export default {
       } catch (error) {
         console.error('Error fetching transaction history:', error);
         uni.showToast({
-          title: 'Failed to fetch transaction history',
+          title: '获取交易历史失败',
           icon: 'none'
         });
       } finally {
@@ -639,7 +645,6 @@ export default {
         const oneYearFromNow = new Date();
         oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
-        // Extract just the orderIds from the orderDetails
         const selectedOrderIds = orderDetails.map(detail => detail.orderId);
 
         const result = await fillSelectedOrders({
@@ -648,16 +653,25 @@ export default {
           baseTokenSymbol: 'SEE',
           quoteTokenSymbol: 'USDT',
           qty: parseFloat(this.customQty),
-          selectedOrderIds, // Now just sending array of IDs
+          selectedOrderIds,
           expirationDate: oneYearFromNow.toISOString()
         });
 
         if (result) {
           this.transactionSuccess = true;
           this.resultMessage = '订单已成功提交';
-          await this.fetchOrderBook();
-          await this.fetchUserBalances();
-          await this.fetchTransactionHistory();
+          
+          // Reset the transaction history before fetching new data
+          this.transactionHistory = [];
+          this.currentPage = 0;
+          this.hasMore = true;
+          
+          // Refresh all data
+          await Promise.all([
+            this.fetchOrderBook(),
+            this.fetchUserBalances(),
+            this.fetchTransactionHistory()
+          ]);
         }
       } catch (error) {
         console.error('Error submitting orders:', error);
@@ -696,6 +710,13 @@ export default {
         this.fetchTransactionHistory();
       }
     },
+    // Add a method to force refresh transaction history
+    async refreshTransactionHistory() {
+      this.transactionHistory = [];
+      this.currentPage = 0;
+      this.hasMore = true;
+      await this.fetchTransactionHistory();
+    }
   },
   mounted() {
     this.fetchOrderBook();
@@ -705,7 +726,7 @@ export default {
       this.userBalances = balances;
     });
     this.setBestPrice();
-    this.fetchTransactionHistory();
+    this.refreshTransactionHistory(); // Use the new refresh method
   }
 };
 </script>

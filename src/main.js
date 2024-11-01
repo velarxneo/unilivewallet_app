@@ -24,7 +24,11 @@ Vue.component('uni-popup', uniPopup)
 import '@/uni.scss'
 
 Vue.config.productionTip = false
-Vue.prototype.$apiBaseUrl = 'http://localhost:8081' // Update this to match your backend URL
+
+// Set API base URL as a global property
+Vue.prototype.$apiBaseUrl = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8081'  // Update this to match your backend port
+  : 'https://your-production-api.com'
 
 // Register BottomMenu as a global component
 Vue.component('BottomMenu', BottomMenu)
@@ -48,8 +52,3 @@ const app = new Vue({
   ...App
 })
 app.$mount()
-
-// Add this if not already present
-app.config.globalProperties.$apiBaseUrl = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8080'  // Change this to match your backend port
-  : 'https://your-production-api.com';
